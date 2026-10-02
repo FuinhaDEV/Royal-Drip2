@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<title>Loja de Roupas</title>
+</head>
+<body>
+
+<h1>Loja de Roupas</h1>
+
+<h2>Produtos</h2>
+
+<p>Camiseta</p>
+Quantidade:
+<input type="number" id="qtdCamiseta" min="1" value="1">
+<button onclick="adicionar('Camiseta', 'qtdCamiseta')">
+Adicionar ao Carrinho
+</button>
+
+<br><br>
+
+<p>Blusa de Moletom</p>
+Quantidade:
+<input type="number" id="qtdBlusa" min="1" value="1">
+<button onclick="adicionar('Blusa de Moletom', 'qtdBlusa')">
+Adicionar ao Carrinho
+</button>
+
+<br><br>
+
+<p>Moletom</p>
+Quantidade:
+<input type="number" id="qtdMoletom" min="1" value="1">
+<button onclick="adicionar('Moletom', 'qtdMoletom')">
+Adicionar ao Carrinho
+</button>
+
+<br><br>
+
+<p>Jaqueta</p>
+Quantidade:
+<input type="number" id="qtdJaqueta" min="1" value="1">
+<button onclick="adicionar('Jaqueta', 'qtdJaqueta')">
+Adicionar ao Carrinho
+</button>
+
+<hr>
+
+<h2>Meu Carrinho</h2>
+
+<ul id="carrinho"></ul>
+
+<button onclick="limparCarrinho()">Limpar Carrinho</button>
+<button onclick="enviarPedido()">Finalizar Compra</button>
+
+<p id="mensagem"></p>
+
+<script>
+
+function adicionar(produto, idQuantidade) {
+
+    let quantidade = document.getElementById(idQuantidade).value;
+
+    let lista = document.getElementById("carrinho");
+    let item = document.createElement("li");
+
+    item.textContent = produto + " - Quantidade: " + quantidade;
+
+    lista.appendChild(item);
+}
+
+function limparCarrinho() {
+
+    document.getElementById("carrinho").innerHTML = "";
+    document.getElementById("mensagem").innerHTML = "";
+}
+
+function enviarPedido() {
+
+    let itens = document.getElementById("carrinho").children;
+
+    if (itens.length === 0) {
+        document.getElementById("mensagem").innerHTML =
+        "❌ Adicione produtos ao carrinho antes de finalizar a compra.";
+    } else {
+        document.getElementById("mensagem").innerHTML =
+        "✅ Compra enviada com sucesso!";
+    }
+}
+
+</script>
+
+</body>
+</html>
+
