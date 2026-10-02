@@ -387,6 +387,26 @@ footer p {
   margin-top: 12px;
 }
 
+.alertas {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.alerta {
+  padding: 12px 14px;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  line-height: 1.4;
+}
+
+.alerta-erro {
+  background: #fee;
+  border-left: 4px solid #d32f2f;
+  color: #c62828;
+}
+
 .produto-principal {
   display: flex;
   align-items: center;

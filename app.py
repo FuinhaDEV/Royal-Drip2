@@ -1,9 +1,10 @@
-from flask import Flask, render_template, request, redirect, url_for
+from flask import Flask, render_template, request, redirect, url_for, session
 import mysql.connector
 import re
-from werkzeug.security import generate_password_hash
+from werkzeug.security import generate_password_hash, check_password_hash
 
 app = Flask(__name__)
+app.secret_key = "royal_drip_secret_2024_chave_segura"
 
 
 def conectar_mysql():
@@ -346,9 +347,74 @@ def registro():
             cursor.close()
             conexao.close()
 
-        return redirect(url_for("index"))
+        return redirect(url_for("login"))
 
     return render_template("registro.html")
+
+# LOGIN
+
+@app.route("/login", methods=["GET", "POST"])
+def login():
+
+    if request.method == "POST":
+
+        email = request.form.get("email", "").strip().lower()
+        senha = request.form.get("senha", "")
+
+        erros = []
+
+        # Validar email
+        if not re.fullmatch(
+            r"^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$",
+            email
+        ):
+            erros.append("E-mail inválido.")
+
+        # Validar senha
+        if not senha or len(senha) < 1:
+            erros.append("Senha obrigatória.")
+
+        if erros:
+            return render_template(
+                "login.html",
+                erros=erros
+            )
+
+        conexao = conectar_mysql()
+        cursor = conexao.cursor(dictionary=True)
+
+        try:
+
+            sql = "SELECT id, nome, email, senha FROM usuarios WHERE email = %s"
+            cursor.execute(sql, (email,))
+            usuario = cursor.fetchone()
+
+            if usuario and check_password_hash(usuario["senha"], senha):
+                session["usuario_id"] = usuario["id"]
+                session["usuario_nome"] = usuario["nome"]
+                session["usuario_email"] = usuario["email"]
+                return redirect(url_for("index"))
+            else:
+                erros = ["E-mail ou senha incorretos."]
+                return render_template(
+                    "login.html",
+                    erros=erros
+                )
+
+        finally:
+
+            cursor.close()
+            conexao.close()
+
+    return render_template("login.html")
+
+# LOGOUT
+
+@app.route("/logout")
+def logout():
+    session.clear()
+    return redirect(url_for("index"))
+
 @app.route("/carrinho/adicionar", methods=["POST"])
 def adicionar_carrinho():
 

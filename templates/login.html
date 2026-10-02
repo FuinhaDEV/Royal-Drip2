@@ -1,39 +1,81 @@
 <!doctype html>
-<html lang="pt-BR">
+<html lang="pt-br">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Royal Drip - Login</title>
+    <title>Login - Royal Drip</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}" />
   </head>
+
   <body>
-    <div class="container">
-      <h2>Royal Drip</h2>
+    <!-- Cabeçalho com Logo -->
+    <header class="cabecalho">
+      <div class="logo">
+        <img
+          class="brand-image"
+          src="/static/imagens/Logo Marca/logo marca (1).png"
+          alt="Royal Drip"
+        />
+      </div>
+      <nav>
+        <ul>
+          <li><a href="/">Home</a></li>
+          <li><a href="/registro">Registrar</a></li>
+        </ul>
+      </nav>
+    </header>
 
-      <label>Login:</label>
-      <input type="text" id="login" placeholder="Digite seu login" />
+    <!-- Formulário de Login -->
+    <main class="registro-container">
+      <div class="registro-card">
+        <h1 class="registro-titulo">Entrar na Conta</h1>
+        <p class="registro-subtitulo">Acesse sua conta para continuar comprando</p>
 
-      <label>Senha:</label>
-      <input type="password" id="senha" placeholder="Digite sua senha" />
+        {% if erros %}
+          <div class="alertas">
+            {% for erro in erros %}
+              <div class="alerta alerta-erro">
+                ⚠️ {{ erro }}
+              </div>
+            {% endfor %}
+          </div>
+        {% endif %}
 
-      <button onclick="entrar()">Entrar</button>
+        <form class="registro-form" method="POST">
+          <div class="form-group">
+            <label for="email">E-mail</label>
+            <input 
+              type="email" 
+              id="email" 
+              name="email"
+              placeholder="seu@email.com.br"
+              required
+            />
+          </div>
 
-      <p id="mensagem"></p>
-    </div>
+          <div class="form-group">
+            <label for="senha">Senha</label>
+            <input 
+              type="password" 
+              id="senha" 
+              name="senha"
+              placeholder="Sua senha"
+              required
+            />
+          </div>
 
-    <script>
-      function entrar() {
-        let login = document.getElementById("login").value;
-        let senha = document.getElementById("senha").value;
+          <button type="submit" class="btn-cadastrar">Entrar</button>
+        </form>
 
-        if (login === "admin" && senha === "1234") {
-          document.getElementById("mensagem").innerHTML =
-            "✅ Login realizado com sucesso!";
-        } else {
-          document.getElementById("mensagem").innerHTML =
-            "❌ Login ou senha incorretos!";
-        }
-      }
-    </script>
+        <p class="login-link">
+          Não possui uma conta? <a href="/registro">Cadastre-se aqui</a>
+        </p>
+      </div>
+    </main>
+
+    <!-- Rodapé -->
+    <footer class="footer">
+      <p>&copy; 2024 Royal Drip. Todos os direitos reservados.</p>
+    </footer>
   </body>
 </html>
