@@ -235,3 +235,402 @@ footer p {
   font-size: 1rem;
   line-height: 1.4;
 }
+
+/* ===== PÁGINA DE PRODUTO ===== */
+
+.topbar {
+  background: #f8f8f8;
+  border-bottom: 1px solid #e0e0e0;
+  padding: 16px 0;
+}
+
+.topbar nav {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 32px;
+  flex-wrap: wrap;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+.topbar a {
+  color: #111;
+  text-decoration: none;
+  font-size: 0.95rem;
+  font-weight: 500;
+  transition: color 0.2s;
+}
+
+.topbar a:hover {
+  color: #001f54;
+}
+
+.produto-page {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 32px 20px;
+}
+
+.voltar {
+  display: inline-block;
+  color: #111;
+  text-decoration: none;
+  font-size: 0.9rem;
+  margin-bottom: 24px;
+  transition: color 0.2s;
+}
+
+.voltar:hover {
+  color: #001f54;
+}
+
+.produto-layout {
+  display: grid;
+  grid-template-columns: 1fr 1.2fr 1fr;
+  gap: 40px;
+  align-items: start;
+}
+
+.produto-imagem-grande {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #f9f9f9;
+  border-radius: 12px;
+  overflow: hidden;
+  min-height: 500px;
+}
+
+.medida-card {
+  background: #fff;
+  padding: 24px;
+  border-radius: 8px;
+  text-align: center;
+  width: 100%;
+  max-width: 300px;
+}
+
+.medida-card h3 {
+  margin: 0 0 16px;
+  font-size: 1rem;
+  font-weight: 600;
+  color: #111;
+}
+
+.medida-figura {
+  position: relative;
+  width: 100%;
+  height: 200px;
+  margin: 16px 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.calca-desenho {
+  width: 80px;
+  height: 140px;
+  border: 2px solid #111;
+  border-radius: 4px;
+  position: relative;
+}
+
+.medida-rotulo {
+  position: absolute;
+  font-size: 0.8rem;
+  font-weight: 700;
+  background: #fff;
+  padding: 0 4px;
+}
+
+.medida-rotulo.q {
+  top: -12px;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.medida-rotulo.a {
+  right: -20px;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.medida-rotulo.l {
+  left: -20px;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.tabela-medidas {
+  width: 100%;
+  font-size: 0.8rem;
+  border-collapse: collapse;
+  margin: 16px 0;
+}
+
+.tabela-medidas th,
+.tabela-medidas td {
+  padding: 8px;
+  text-align: center;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.tabela-medidas th {
+  font-weight: 600;
+  background: #f5f5f5;
+}
+
+.medida-nota {
+  font-size: 0.75rem;
+  color: #666;
+  margin-top: 12px;
+}
+
+.produto-principal {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #fff;
+  border-radius: 12px;
+  overflow: hidden;
+  min-height: 500px;
+}
+
+.produto-principal img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.produto-info {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.produto-info h1 {
+  margin: 0;
+  font-size: 2rem;
+  font-weight: 700;
+  line-height: 1.2;
+  color: #111;
+}
+
+.preco {
+  margin: 0;
+  font-size: 2.4rem;
+  font-weight: 700;
+  color: #111;
+}
+
+.preco-info {
+  margin: 0;
+  font-size: 0.95rem;
+  line-height: 1.6;
+  color: #666;
+}
+
+.preco-info a {
+  color: #001f54;
+  text-decoration: underline;
+}
+
+.detalhes {
+  font-size: 0.95rem;
+  line-height: 1.6;
+  color: #555;
+}
+
+.detalhes strong {
+  color: #111;
+}
+
+.frete {
+  font-size: 0.9rem;
+  color: #4a7c3d;
+  padding: 12px;
+  background: #f0f8ed;
+  border-radius: 6px;
+  border-left: 4px solid #4a7c3d;
+}
+
+.frete strong {
+  color: #2d5a28;
+}
+
+.tabela-tamanho {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.tabela-tamanho h3 {
+  margin: 0;
+  font-size: 0.85rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: #111;
+}
+
+.tamanhos {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.tamanho {
+  position: relative;
+  flex: 0 1 calc(25% - 6px);
+  min-width: 60px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid #d0d0d0;
+  background: #fff;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.tamanho input {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.tamanho span {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+}
+
+.tamanho input:checked + span {
+  color: #fff;
+}
+
+.tamanho input:checked {
+  background: #111;
+}
+
+.tamanho:has(input:checked) {
+  background: #111;
+  color: #fff;
+  border-color: #111;
+}
+
+.tamanho:hover:not(:has(input:checked)) {
+  border-color: #111;
+  background: #fafafa;
+}
+
+.medidas-link {
+  display: inline-block;
+  font-size: 0.85rem;
+  color: #001f54;
+  text-decoration: underline;
+  margin-top: 8px;
+}
+
+.acoes {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 12px;
+}
+
+.acoes label {
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: #111;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.quantidade-input {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid #d0d0d0;
+  border-radius: 6px;
+  font-size: 1rem;
+  font-family: inherit;
+  transition: border-color 0.2s;
+}
+
+.quantidade-input:focus {
+  outline: none;
+  border-color: #111;
+}
+
+.comprar {
+  background: #111;
+  color: #fff;
+  border: none;
+  padding: 16px 24px;
+  font-size: 1rem;
+  font-weight: 600;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.comprar:hover {
+  background: #001f54;
+  transform: translateY(-2px);
+}
+
+.comprar:active {
+  transform: translateY(0);
+}
+
+/* Responsivo */
+@media (max-width: 1200px) {
+  .produto-layout {
+    grid-template-columns: 1fr 1fr;
+    gap: 30px;
+  }
+
+  .produto-imagem-grande {
+    grid-column: 1 / -1;
+  }
+}
+
+@media (max-width: 768px) {
+  .topbar nav {
+    gap: 16px;
+  }
+
+  .topbar a {
+    font-size: 0.85rem;
+  }
+
+  .produto-layout {
+    grid-template-columns: 1fr;
+    gap: 24px;
+  }
+
+  .produto-info h1 {
+    font-size: 1.5rem;
+  }
+
+  .preco {
+    font-size: 1.8rem;
+  }
+
+  .tamanhos {
+    gap: 6px;
+  }
+
+  .tamanho {
+    flex: 0 1 calc(33.333% - 4px);
+  }
+}
