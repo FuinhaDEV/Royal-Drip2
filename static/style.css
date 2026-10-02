@@ -634,3 +634,157 @@ footer p {
     flex: 0 1 calc(33.333% - 4px);
   }
 }
+
+/* ===== PÁGINA DE REGISTRO ===== */
+
+.registro-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: calc(100vh - 300px);
+  padding: 40px 20px;
+  background: linear-gradient(135deg, #f3f3f3 0%, #ffffff 100%);
+}
+
+.registro-card {
+  background: white;
+  padding: 48px 40px;
+  border-radius: 12px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08);
+  width: 100%;
+  max-width: 420px;
+  border-top: 4px solid #001f54;
+}
+
+.registro-titulo {
+  margin: 0 0 8px;
+  font-size: 2rem;
+  font-weight: 700;
+  color: #111;
+  text-align: center;
+}
+
+.registro-subtitulo {
+  margin: 0 0 28px;
+  font-size: 0.95rem;
+  color: #5a5a5a;
+  text-align: center;
+  line-height: 1.5;
+}
+
+.registro-form {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.form-group label {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #111;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.form-group input {
+  padding: 12px 14px;
+  border: 1px solid #d0d0d0;
+  border-radius: 6px;
+  font-size: 1rem;
+  font-family: inherit;
+  background: #fafafa;
+  transition: all 0.3s ease;
+  color: #111;
+}
+
+.form-group input:focus {
+  outline: none;
+  background: #fff;
+  border-color: #001f54;
+  box-shadow: 0 0 0 3px rgba(0, 31, 84, 0.1);
+}
+
+.form-group input::placeholder {
+  color: #aaa;
+}
+
+.btn-cadastrar {
+  padding: 14px 24px;
+  background: linear-gradient(135deg, #001f54 0%, #002d7a 100%);
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  margin-top: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(0, 31, 84, 0.2);
+}
+
+.btn-cadastrar:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(0, 31, 84, 0.3);
+  background: linear-gradient(135deg, #002d7a 0%, #003d9a 100%);
+}
+
+.btn-cadastrar:active {
+  transform: translateY(0);
+}
+
+.login-link {
+  text-align: center;
+  margin: 24px 0 0;
+  font-size: 0.9rem;
+  color: #5a5a5a;
+}
+
+.login-link a {
+  color: #001f54;
+  text-decoration: none;
+  font-weight: 600;
+  transition: color 0.2s ease;
+}
+
+.login-link a:hover {
+  color: #003d9a;
+  text-decoration: underline;
+}
+
+/* Responsivo - Registro */
+@media (max-width: 768px) {
+  .registro-card {
+    padding: 40px 24px;
+    max-width: 100%;
+  }
+
+  .registro-titulo {
+    font-size: 1.6rem;
+  }
+
+  .form-group {
+    gap: 5px;
+  }
+
+  .form-group label {
+    font-size: 0.8rem;
+  }
+
+  .form-group input {
+    padding: 11px 12px;
+    font-size: 16px;
+  }
+
+  .btn-cadastrar {
+    padding: 12px 20px;
+    font-size: 0.95rem;
+  }
+}
