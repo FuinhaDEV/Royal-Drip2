@@ -1,40 +1,39 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="pt-BR">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Royal Drip - Login</title>
-</head>
-<body>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}" />
+  </head>
+  <body>
+    <div class="container">
+      <h2>Royal Drip</h2>
 
-<div class="container">
-    <h2>Royal Drip</h2>
+      <label>Login:</label>
+      <input type="text" id="login" placeholder="Digite seu login" />
 
-    <label>Login:</label>
-    <input type="text" id="login" placeholder="Digite seu login">
+      <label>Senha:</label>
+      <input type="password" id="senha" placeholder="Digite sua senha" />
 
-    <label>Senha:</label>
-    <input type="password" id="senha" placeholder="Digite sua senha">
+      <button onclick="entrar()">Entrar</button>
 
-    <button onclick="entrar()">Entrar</button>
+      <p id="mensagem"></p>
+    </div>
 
-    <p id="mensagem"></p>
-</div>
+    <script>
+      function entrar() {
+        let login = document.getElementById("login").value;
+        let senha = document.getElementById("senha").value;
 
-<script>
-function entrar(){
-    let login = document.getElementById("login").value;
-    let senha = document.getElementById("senha").value;
-
-    if(login === "admin" && senha === "1234"){
-        document.getElementById("mensagem").innerHTML =
-        "✅ Login realizado com sucesso!";
-    } else {
-        document.getElementById("mensagem").innerHTML =
-        "❌ Login ou senha incorretos!";
-    }
-}
-</script>
-
-</body>
+        if (login === "admin" && senha === "1234") {
+          document.getElementById("mensagem").innerHTML =
+            "✅ Login realizado com sucesso!";
+        } else {
+          document.getElementById("mensagem").innerHTML =
+            "❌ Login ou senha incorretos!";
+        }
+      }
+    </script>
+  </body>
 </html>

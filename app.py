@@ -9,9 +9,9 @@ app = Flask(__name__)
 def conectar_mysql():
     return mysql.connector.connect(
         host="localhost",
-        user="root",
-        password="SUA_SENHA",
-        database="royal_drip"
+        user="root",        
+        password="senai105",  
+        database="DADOS_ROYAL_DRIP"
     )
 
 # Rota Principal
@@ -407,6 +407,14 @@ def carrinho():
     return render_template("carrinho.html")
 
 #executar tudo isso
+#conectar MYSQL 
+def conectar_mysql():
+    return mysql.connector.connect(
+        host="localhost",
+        user="root",
+        password="senai105",
+        database="DADOS_ROYAL_DRIP"
+    )
 
 if __name__ == "__main__":
     app.run(debug=True)

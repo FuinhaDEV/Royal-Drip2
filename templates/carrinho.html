@@ -1,95 +1,88 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="pt-BR">
-<head>
-<meta charset="UTF-8">
-<title>Loja de Roupas</title>
-</head>
-<body>
+  <head>
+    <meta charset="UTF-8" />
+    <title>Loja de Roupas</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}" />
+  </head>
+  <body>
+    <h1>Loja de Roupas</h1>
 
-<h1>Loja de Roupas</h1>
+    <h2>Produtos</h2>
 
-<h2>Produtos</h2>
+    <p>Camiseta</p>
+    Quantidade:
+    <input type="number" id="qtdCamiseta" min="1" value="1" />
+    <button onclick="adicionar('Camiseta', 'qtdCamiseta')">
+      Adicionar ao Carrinho
+    </button>
 
-<p>Camiseta</p>
-Quantidade:
-<input type="number" id="qtdCamiseta" min="1" value="1">
-<button onclick="adicionar('Camiseta', 'qtdCamiseta')">
-Adicionar ao Carrinho
-</button>
+    <br /><br />
 
-<br><br>
+    <p>Blusa de Moletom</p>
+    Quantidade:
+    <input type="number" id="qtdBlusa" min="1" value="1" />
+    <button onclick="adicionar('Blusa de Moletom', 'qtdBlusa')">
+      Adicionar ao Carrinho
+    </button>
 
-<p>Blusa de Moletom</p>
-Quantidade:
-<input type="number" id="qtdBlusa" min="1" value="1">
-<button onclick="adicionar('Blusa de Moletom', 'qtdBlusa')">
-Adicionar ao Carrinho
-</button>
+    <br /><br />
 
-<br><br>
+    <p>Moletom</p>
+    Quantidade:
+    <input type="number" id="qtdMoletom" min="1" value="1" />
+    <button onclick="adicionar('Moletom', 'qtdMoletom')">
+      Adicionar ao Carrinho
+    </button>
 
-<p>Moletom</p>
-Quantidade:
-<input type="number" id="qtdMoletom" min="1" value="1">
-<button onclick="adicionar('Moletom', 'qtdMoletom')">
-Adicionar ao Carrinho
-</button>
+    <br /><br />
 
-<br><br>
+    <p>Jaqueta</p>
+    Quantidade:
+    <input type="number" id="qtdJaqueta" min="1" value="1" />
+    <button onclick="adicionar('Jaqueta', 'qtdJaqueta')">
+      Adicionar ao Carrinho
+    </button>
 
-<p>Jaqueta</p>
-Quantidade:
-<input type="number" id="qtdJaqueta" min="1" value="1">
-<button onclick="adicionar('Jaqueta', 'qtdJaqueta')">
-Adicionar ao Carrinho
-</button>
+    <hr />
 
-<hr>
+    <h2>Meu Carrinho</h2>
 
-<h2>Meu Carrinho</h2>
+    <ul id="carrinho"></ul>
 
-<ul id="carrinho"></ul>
+    <button onclick="limparCarrinho()">Limpar Carrinho</button>
+    <button onclick="enviarPedido()">Finalizar Compra</button>
 
-<button onclick="limparCarrinho()">Limpar Carrinho</button>
-<button onclick="enviarPedido()">Finalizar Compra</button>
+    <p id="mensagem"></p>
 
-<p id="mensagem"></p>
+    <script>
+      function adicionar(produto, idQuantidade) {
+        let quantidade = document.getElementById(idQuantidade).value;
 
-<script>
+        let lista = document.getElementById("carrinho");
+        let item = document.createElement("li");
 
-function adicionar(produto, idQuantidade) {
+        item.textContent = produto + " - Quantidade: " + quantidade;
 
-    let quantidade = document.getElementById(idQuantidade).value;
+        lista.appendChild(item);
+      }
 
-    let lista = document.getElementById("carrinho");
-    let item = document.createElement("li");
+      function limparCarrinho() {
+        document.getElementById("carrinho").innerHTML = "";
+        document.getElementById("mensagem").innerHTML = "";
+      }
 
-    item.textContent = produto + " - Quantidade: " + quantidade;
+      function enviarPedido() {
+        let itens = document.getElementById("carrinho").children;
 
-    lista.appendChild(item);
-}
-
-function limparCarrinho() {
-
-    document.getElementById("carrinho").innerHTML = "";
-    document.getElementById("mensagem").innerHTML = "";
-}
-
-function enviarPedido() {
-
-    let itens = document.getElementById("carrinho").children;
-
-    if (itens.length === 0) {
-        document.getElementById("mensagem").innerHTML =
-        "❌ Adicione produtos ao carrinho antes de finalizar a compra.";
-    } else {
-        document.getElementById("mensagem").innerHTML =
-        "✅ Compra enviada com sucesso!";
-    }
-}
-
-</script>
-
-</body>
+        if (itens.length === 0) {
+          document.getElementById("mensagem").innerHTML =
+            "❌ Adicione produtos ao carrinho antes de finalizar a compra.";
+        } else {
+          document.getElementById("mensagem").innerHTML =
+            "✅ Compra enviada com sucesso!";
+        }
+      }
+    </script>
+  </body>
 </html>
-
