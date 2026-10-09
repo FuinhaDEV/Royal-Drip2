@@ -10,19 +10,36 @@
     <!-- Cabeçalho principal com Nome, Slogan e Navegação -->
     <header class="cabecalho">
       <div class="header-icons">
-        <!-- Link direcionado para a rota /registro do Flask -->
-        <a href="/registro" aria-label="Minha conta" class="icon-link">
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="black"
-            stroke-width="1.5"
-          >
-            <circle cx="12" cy="8" r="3.5" />
-            <path d="M5 20c0-3.5 3-6 7-6s7 2.5 7 6" />
-          </svg>
-        </a>
+        <!-- Menu de Conta (com dropdown) -->
+        <div class="account-menu">
+          <button aria-label="Minha conta" class="icon-link account-btn" id="account-btn">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="black"
+              stroke-width="1.5"
+            >
+              <circle cx="12" cy="8" r="3.5" />
+              <path d="M5 20c0-3.5 3-6 7-6s7 2.5 7 6" />
+            </svg>
+          </button>
+
+          <div class="account-dropdown" id="account-dropdown">
+            {% if session.get('usuario_id') %}
+              <div class="user-info">
+                <p class="user-name">{{ session.get('usuario_nome') }}</p>
+                <p class="user-email">{{ session.get('usuario_email') }}</p>
+              </div>
+              <hr class="dropdown-divider" />
+              <a href="/carrinho" class="dropdown-item">Meu Carrinho</a>
+              <a href="/logout" class="dropdown-item logout-link">Sair da Conta</a>
+            {% else %}
+              <a href="/login" class="dropdown-item">Fazer Login</a>
+              <a href="/registro" class="dropdown-item">Criar Conta</a>
+            {% endif %}
+          </div>
+        </div>
 
         <a href="/carrinho" aria-label="Carrinho de compras" class="icon-link">
           <svg
@@ -226,5 +243,25 @@
     <footer>
       <p>&copy; 2026 Royal Drip Streetwear. Todos os direitos reservados.</p>
     </footer>
+
+    <script>
+      // Dropdown do Menu de Conta
+      const accountBtn = document.getElementById('account-btn');
+      const accountDropdown = document.getElementById('account-dropdown');
+
+      if (accountBtn && accountDropdown) {
+        accountBtn.addEventListener('click', function(e) {
+          e.preventDefault();
+          accountDropdown.classList.toggle('active');
+        });
+
+        // Fechar dropdown ao clicar fora
+        document.addEventListener('click', function(e) {
+          if (!e.target.closest('.account-menu')) {
+            accountDropdown.classList.remove('active');
+          }
+        });
+      }
+    </script>
   </body>
 </html>

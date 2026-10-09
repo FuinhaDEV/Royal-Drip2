@@ -575,6 +575,40 @@ def remover_carrinho(id_carrinho):
 
 
 # ----------------------------------------------------------------------------
+# PEDIDOS DOS CLIENTES (SELECT com INNER JOIN: pedidos + clientes)
+# ----------------------------------------------------------------------------
+@app.route("/pedidos")
+def listar_pedidos():
+    pedidos = []
+    erro = None
+    conexao = None
+    cursor = None
+    try:
+        conexao = conectar_mysql()
+        cursor = conexao.cursor(dictionary=True)
+        cursor.execute(
+            """
+            SELECT p.id_pedido, c.nome, c.cidade, c.estado,
+                   p.data_pedido, p.valor_total, p.status_pedido
+            FROM pedidos p
+            INNER JOIN clientes c ON c.id_cliente = p.id_cliente
+            ORDER BY p.data_pedido DESC
+            """
+        )
+        pedidos = cursor.fetchall()
+    except mysql.connector.Error:
+        log.exception("Erro ao listar pedidos")
+        erro = "Não foi possível carregar os pedidos. Tente novamente."
+    finally:
+        if cursor:
+            cursor.close()
+        if conexao:
+            conexao.close()
+
+    return render_template("pedidos.html", pedidos=pedidos, erro=erro)
+
+
+# ----------------------------------------------------------------------------
 # EXECUTAR
 # ----------------------------------------------------------------------------
 if __name__ == "__main__":
