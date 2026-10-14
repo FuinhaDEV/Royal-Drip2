@@ -1,0 +1,483 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Royal Drip | Streetwear</title>
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='style.css') }}"
+    />
+  </head>
+  <body>
+    <!-- Cabeçalho Principal -->
+    <header class="cabecalho">
+      <div class="header-icons">
+        <!-- Menu de Conta (com dropdown) -->
+        <div class="account-menu">
+          <button
+            aria-label="Minha conta"
+            class="icon-link account-btn"
+            id="account-btn"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1.8"
+            >
+              <circle cx="12" cy="8" r="3.5" />
+              <path d="M5 20c0-3.5 3-6 7-6s7 2.5 7 6" />
+            </svg>
+          </button>
+
+          <div class="account-dropdown" id="account-dropdown">
+            {% if session.get('usuario_id') %}
+            <div class="user-info">
+              <p class="user-name">{{ session.get('usuario_nome') }}</p>
+              <p class="user-email">{{ session.get('usuario_email') }}</p>
+            </div>
+            <hr class="dropdown-divider" />
+            <a href="/carrinho" class="dropdown-item">Meu Carrinho</a>
+            <a href="/logout" class="dropdown-item logout-link"
+              >Sair da Conta</a
+            >
+            {% else %}
+            <a href="/login" class="dropdown-item">Fazer Login</a>
+            <a href="/registro" class="dropdown-item">Criar Conta</a>
+            {% endif %}
+          </div>
+        </div>
+
+        <a href="/carrinho" aria-label="Carrinho de compras" class="icon-link">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="1.8"
+          >
+            <path d="M6 8h12l-1 12H7L6 8z" />
+            <path d="M9 8V6a3 3 0 0 1 6 0v2" />
+          </svg>
+        </a>
+      </div>
+
+      <div class="logo">
+        <a href="/">
+          <img
+            class="brand-image"
+            src="/static/imagens/Logo Marca/logo marca (1).png"
+            alt="Royal Drip Logo"
+          />
+        </a>
+      </div>
+
+      <nav class="nav-principal">
+        <ul>
+          <li><a href="#produtos">Lançamentos</a></li>
+          <li><a href="{{ url_for('listar_pedidos') }}">Pedidos</a></li>
+          <li><a href="#sobre">Sobre Nós</a></li>
+          <li><a href="#contato">Atendimento</a></li>
+        </ul>
+      </nav>
+
+      <!-- Seção de Produtos -->
+      <section id="produtos" class="secao-container">
+
+        <!-- BOTÕES APENAS PARA FILTRAR OS PRODUTOS -->
+        <div class="nav-categorias">
+          <button class="btn-filtro active" data-filter="todos">Todos</button>
+          <button class="btn-filtro" data-filter="camisetas">Camisetas</button>
+          <button class="btn-filtro" data-filter="conjuntos">Conjuntos</button>
+          <button class="btn-filtro" data-filter="calcas">Calças</button>
+          <button class="btn-filtro" data-filter="gorros">Gorros</button>
+        </div>
+
+        <div class="produtos-grid">
+          <!-- Seus cards de produtos aqui -->
+        </div>
+      </section>
+
+    </header>
+
+    <!-- Conteúdo Principal -->
+    <main>
+      <!-- Seção de Produtos -->
+      <section id="produtos" class="secao-container">
+        <h2 class="titulo-secao">Nossos Lançamentos</h2>
+
+        <div class="produtos-grid">
+
+          <!-- Item 1 -->
+          <a class="produto-card" data-categoria="camisetas" href="{{ url_for('produto', produto_id=1) }}">
+            <div class="produto-imagem-wrap">
+              <img
+                src="/static/imagens/camisas/camisa 1.jpeg"
+                alt="Camisa Boxy Dark Angel Drop 1"
+              />
+            </div>
+            <span class="produto-nome">Camisa Boxy Dark Angel Drop 1</span>
+          </a>
+
+          <!-- Item 2 -->
+          <a class="produto-card" data-categoria="camisetas" href="{{ url_for('produto', produto_id=2) }}">
+            <div class="produto-imagem-wrap">
+              <img
+                src="/static/imagens/camisas/camisa 2.jpeg"
+                alt="Camisa Boxy Black Bite Drop 2"
+              />
+            </div>
+            <span class="produto-nome">Camisa Boxy Black Bite Drop 2</span>
+          </a>
+
+          <!-- Item 3 -->
+          <a class="produto-card" data-categoria="camisetas" href="{{ url_for('produto', produto_id=3) }}">
+            <div class="produto-imagem-wrap">
+              <img
+                src="/static/imagens/camisas/camisa 3.jpeg"
+                alt="Camisa Boxy Light Bite Drop 3"
+              />
+            </div>
+            <span class="produto-nome">Camisa Boxy Light Bite Drop 3</span>
+          </a>
+
+          <!-- Item 4 -->
+          <a class="produto-card" data-categoria="conjuntos" href="{{ url_for('produto', produto_id=4) }}">
+            <div class="produto-imagem-wrap">
+              <img
+                src="/static/imagens/blusas_Conjuntos/conjunto moletom cinza.jpg"
+                alt="Conjunto Cinza Street Drop 1"
+              />
+            </div>
+            <span class="produto-nome">Conjunto Cinza Street Drop 1</span>
+          </a>
+
+          <!-- Item 5 -->
+          <a class="produto-card" data-categoria="conjuntos" href="{{ url_for('produto', produto_id=5) }}">
+            <div class="produto-imagem-wrap">
+              <img
+                src="/static/imagens/blusas_Conjuntos/USA.jpg"
+                alt="Conjunto UK Drop 2"
+              />
+            </div>
+            <span class="produto-nome">Conjunto UK Drop 2</span>
+          </a>
+
+          <!-- Item 6 -->
+          <a class="produto-card" data-categoria="conjuntos" href="{{ url_for('produto', produto_id=6) }}">
+            <div class="produto-imagem-wrap">
+              <img
+                src="/static/imagens/blusas_Conjuntos/conjunto branco copy.jpg"
+                alt="Conjunto Branco Street Drop 3"
+              />
+            </div>
+            <span class="produto-nome">Conjunto Branco Street Drop 3</span>
+          </a>
+
+          <!-- Item 7 -->
+          <a class="produto-card" data-categoria="conjuntos" href="{{ url_for('produto', produto_id=7) }}">
+            <div class="produto-imagem-wrap">
+              <img
+                src="/static/imagens/blusas_Conjuntos/conj2.jpg"
+                alt="Conjunto Blue Street Drop 4"
+              />
+            </div>
+            <span class="produto-nome">Conjunto Blue Street Drop 4</span>
+          </a>
+
+          <!-- Item 8 -->
+          <a class="produto-card" data-categoria="conjuntos" href="{{ url_for('produto', produto_id=8) }}">
+            <div class="produto-imagem-wrap">
+              <img
+                src="/static/imagens/blusas_Conjuntos/conj3.jpg"
+                alt="Conjunto Camuflado Street Drop 5"
+              />
+            </div>
+            <span class="produto-nome">Conjunto Camuflado Street Drop 5</span>
+          </a>
+
+          <!-- Item 9 -->
+          <a class="produto-card"  data-categoria="conjuntos" href="{{ url_for('produto', produto_id=9) }}">
+            <div class="produto-imagem-wrap">
+              <img
+                src="/static/imagens/blusas_Conjuntos/conj4.jpg"
+                alt="Conjunto Cimento Street Drop 6"
+              />
+            </div>
+            <span class="produto-nome">Conjunto Cimento Street Drop 6</span>
+          </a>
+
+          <!-- Item 10 -->
+          <a
+            class="produto-card" data-categoria="calcas"
+            href="{{ url_for('produto', produto_id=10) }}"
+          >
+            <div class="produto-imagem-wrap">
+              <img
+                src="/static/imagens/calcas/Calça Moletom.jpg"
+                alt="Calça Moletom Letringg Drop 7"
+              />
+            </div>
+            <span class="produto-nome">Calça Moletom Letringg Drop 7</span>
+          </a>
+
+          <!-- Item 11 -->
+          <a
+            class="produto-card" data-categoria="calcas"
+            href="{{ url_for('produto', produto_id=11) }}"
+          >
+            <div class="produto-imagem-wrap">
+              <img
+                src="/static/imagens/calcas/calça branca.jpg"
+                alt="Calça Moletom Branca Drop 8"
+              />
+            </div>
+            <span class="produto-nome">Calça Moletom Branca Drop 8</span>
+          </a>
+
+          <!-- Item 12 -->
+          <a
+            class="produto-card" data-categoria="calcas"
+            href="{{ url_for('produto', produto_id=12) }}"
+          >
+            <div class="produto-imagem-wrap">
+              <img
+                src="/static/imagens/calcas/calça azul.jpg"
+                alt="Calça Moletom Azul Drop 9"
+              />
+            </div>
+            <span class="produto-nome">Calça Moletom Azul Drop 9</span>
+          </a>
+
+          <!-- Item 13 -->
+          <a
+            class="produto-card" data-categoria="calcas"
+            href="{{ url_for('produto', produto_id=13) }}"
+          >
+            <div class="produto-imagem-wrap">
+              <img
+                src="/static/imagens/calcas/calça jeans hard 2.jpeg"
+                alt="Calça Jeans Baggy Hard"
+              />
+            </div>
+            <span class="produto-nome">Calça Jeans Baggy Hard</span>
+          </a>
+
+          <!-- Item 14 -->
+          <a
+            class="produto-card" data-categoria="calcas"
+            href="{{ url_for('produto', produto_id=14) }}"
+          >
+            <div class="produto-imagem-wrap">
+              <img
+                src="/static/imagens/calcas/calça jeans hard.jpeg"
+                alt="Calça Jeans Baggy Worn Out"
+              />
+            </div>
+            <span class="produto-nome">Calça Jeans Baggy Worn Out</span>
+          </a>
+
+          <!-- Item 15 -->
+          <a
+            class="produto-card" data-categoria="calcas"
+            href="{{ url_for('produto', produto_id=15) }}"
+          >
+            <div class="produto-imagem-wrap">
+              <img
+                src="/static/imagens/calcas/calça regular bless.png"
+                alt="Calça Regular Bless"
+              />
+            </div>
+            <span class="produto-nome">Calça Regular Bless</span>
+          </a>
+
+          <!-- Item 16 -->
+          <a
+            class="produto-card" data-categoria="calcas"
+            href="{{ url_for('produto', produto_id=16) }}"
+          >
+            <div class="produto-imagem-wrap">
+              <img
+                src="/static/imagens/calcas/calça jeans sant.png"
+                alt="Calça Jeans Sant"
+              />
+            </div>
+            <span class="produto-nome">Calça Jeans Sant</span>
+          </a>
+
+          <!-- Item 17 -->
+          <a
+            class="produto-card" data-categoria="calcas"
+            href="{{ url_for('produto', produto_id=17) }}"
+          >
+            <div class="produto-imagem-wrap">
+              <img
+                src="/static/imagens/calcas/calça jeans barrel.png"
+                alt="Calça Jeans Barrel"
+              />
+            </div>
+            <span class="produto-nome">Calça Jeans Barrel</span>
+          </a>
+
+          <!-- Item 18 -->
+          <a
+            class="produto-card" data-categoria="calcas"
+            href="{{ url_for('produto', produto_id=18) }}"
+          >
+            <div class="produto-imagem-wrap">
+              <img
+                src="/static/imagens/calcas/calça baggy nation.png"
+                alt="Calça Baggy Nation"
+              />
+            </div>
+            <span class="produto-nome">Calça Baggy Nation</span>
+          </a>
+
+          <!-- Item 19 -->
+          <a
+            class="produto-card" data-categoria="calcas"
+            href="{{ url_for('produto', produto_id=19) }}"
+          >
+            <div class="produto-imagem-wrap">
+              <img
+                src="/static/imagens/calcas/calça baggy camuflada.png"
+                alt="Calça Jeans Baggy Camuflada"
+              />
+            </div>
+            <span class="produto-nome">Calça Jeans Baggy Camuflada</span>
+          </a>
+
+          <!-- Item 20 -->
+          <a
+            class="produto-card" data-categoria="gorros"
+            href="{{ url_for('produto', produto_id=20) }}"
+          >
+            <div class="produto-imagem-wrap">
+              <img
+                src="/static/imagens/gorros/gorro oncinha y2k.png"
+                alt="Gorro Oncinha Y2K"
+              />
+            </div>
+            <span class="produto-nome">Gorro Oncinha Y2K</span>
+          </a>
+
+          <!-- Item 21 -->
+          <a
+            class="produto-card" data-categoria="gorros"
+            href="{{ url_for('produto', produto_id=21) }}"
+          >
+            <div class="produto-imagem-wrap">
+              <img
+                src="/static/imagens/gorros/gorro pré cort.png"
+                alt="Gorro Pré Cort"
+              />
+            </div>
+            <span class="produto-nome">Gorro Pré Cort</span>
+          </a>
+
+          <!-- Item 22 -->
+          <a
+            class="produto-card" data-categoria="gorros"
+            href="{{ url_for('produto', produto_id=22) }}"
+          >
+            <div class="produto-imagem-wrap">
+              <img
+                src="/static/imagens/gorros/gorro y2k black.png"
+                alt="Gorro Y2K Black"
+              />
+            </div>
+            <span class="produto-nome">Gorro Y2K Black</span>
+          </a>
+
+          <!-- Item 23 -->
+          <a
+            class="produto-card" data-categoria="gorros"
+            href="{{ url_for('produto', produto_id=23) }}"
+          >
+            <div class="produto-imagem-wrap">
+              <img
+                src="/static/imagens/gorros/gorro y2k white.png"
+                alt="Gorro Y2K White"
+              />
+            </div>
+            <span class="produto-nome">Gorro Y2K White</span>
+          </a>
+
+          <!-- Item 24 -->
+          <a
+            class="produto-card" data-categoria="gorros"
+            href="{{ url_for('produto', produto_id=24) }}"
+          >
+            <div class="produto-imagem-wrap">
+              <img
+                src="/static/imagens/gorros/gorro white red.jpg"
+                alt="Gorro White Red"
+              />
+            </div>
+            <span class="produto-nome">Gorro White Red</span>
+          </a>
+        </div>
+      </section>
+
+      <!-- Seção Sobre -->
+      <section id="sobre" class="info-bloco">
+        <div class="info-conteudo">
+          <h2>Sobre a Royal Drip</h2>
+          <p>
+            Criada no coração do cenário urbano, a Royal Drip nasceu para dar
+            voz à cultura das ruas através do vestuário e da personalidade de
+            cada um. Trabalhamos com tiragens limitadas e coleções exclusivas
+            para garantir originalidade e expressão individual em cada peça que
+            você veste.
+          </p>
+        </div>
+      </section>
+
+      <!-- Seção Contato -->
+      <section id="contato" class="info-bloco">
+        <div class="info-conteudo">
+          <h2>Atendimento & Drops</h2>
+          <p>
+            Deseja tirar dúvidas sobre o tamanho ideal, envios ou ficar por
+            dentro do próximo drop exclusivo? Fale com a nossa equipe:
+          </p>
+          <ul class="contato-lista">
+            <li><strong>E-mail:</strong> Royal.Drip@gmail.com</li>
+            <li><strong>WhatsApp:</strong> (11) 96666-7777</li>
+            <li>
+              <strong>Horário de Atendimento:</strong> Segunda a Sábado, das 10h
+              às 19h
+            </li>
+          </ul>
+        </div>
+      </section>
+    </main>
+
+    <!-- Rodapé -->
+    <footer class="rodape-principal">
+      <p>&copy; 2026 Royal Drip Streetwear. Todos os direitos reservados.</p>
+    </footer>
+
+    <script>
+      const accountBtn = document.getElementById("account-btn");
+      const accountDropdown = document.getElementById("account-dropdown");
+
+      if (accountBtn && accountDropdown) {
+        accountBtn.addEventListener("click", function (e) {
+          e.preventDefault();
+          accountDropdown.classList.toggle("active");
+        });
+
+        document.addEventListener("click", function (e) {
+          if (!e.target.closest(".account-menu")) {
+            accountDropdown.classList.remove("active");
+          }
+        });
+      }
+      
+    </script>
+    <script src="{{ url_for('static', filename='js/java_navbar.js') }}"></script>
+  </body>
+</html>

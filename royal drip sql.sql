@@ -1,615 +1,272 @@
-import logging
-import os
-import re
-from functools import wraps
-
-import mysql.connector
-from flask import Flask, redirect, render_template, request, session, url_for
-from werkzeug.security import check_password_hash, generate_password_hash
-
-app = Flask(__name__)
-
-# Em produção, defina estas variáveis de ambiente (os valores abaixo são só para desenvolvimento).
-app.secret_key = os.environ.get("SECRET_KEY", "royal_drip_dev_key_troque_em_producao")
-
-logging.basicConfig(level=logging.INFO)
-log = logging.getLogger("royal_drip")
-
-EMAIL_REGEX = r"^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$"
-NOME_REGEX = r"[A-Za-zÀ-ÿ\s]{3,100}"
-
-
-# ----------------------------------------------------------------------------
-# BANCO DE DADOS (uma única função de conexão)
-# ----------------------------------------------------------------------------
-def conectar_mysql():
-    return mysql.connector.connect(
-        host=os.environ.get("DB_HOST", "localhost"),
-        user=os.environ.get("DB_USER", "root"),
-        password=os.environ.get("DB_PASSWORD", "senai105"),
-        database=os.environ.get("DB_NAME", "ROYAL_DRIP_SQL"),
-    )
-
-
-# ----------------------------------------------------------------------------
-# PRODUTOS (mesmos ids, nomes e preços da tabela `produtos` do SQL)
-# ----------------------------------------------------------------------------
-PRODUTOS = {
-    1: {
-        "id": 1,
-        "nome": "camisa boxy dark angel drop1",
-        "titulo": "Camisa Boxy Dark Angel Drop 01",
-        "preco": 129.90,
-        "imagem": "imagens/camisas/camisa 1.jpg",
-        "descricao": "Modelagem ampla com corte streetwear moderno, algodão encorpado e acabamento premium para o dia a dia com atitude.",
-        "tamanhos": ["P", "M", "G", "GG", "XG", "2XG"],
-        "categoria": "Camisetas",
-        "medidas": [
-            {"tamanho": "P", "Q": 83.5, "A": 111, "L": 36.5},
-            {"tamanho": "M", "Q": 85.5, "A": 112, "L": 37.5},
-            {"tamanho": "G", "Q": 93, "A": 113, "L": 38.5},
-            {"tamanho": "GG", "Q": 95, "A": 113, "L": 39.5},
-            {"tamanho": "XG", "Q": 99, "A": 114, "L": 41},
-            {"tamanho": "2XG", "Q": 104, "A": 115, "L": 41},
-        ],
-    },
-    2: {
-        "id": 2,
-        "nome": "camisa boxy black bite drop2",
-        "titulo": "Camisa Boxy Black Bite Drop 02",
-        "preco": 139.90,
-        "imagem": "imagens/camisas/camisa 2.jpg",
-        "descricao": "Corte oversized com visual urbano, estampa marcante e tecido confortável para uso diário.",
-        "tamanhos": ["P", "M", "G", "GG", "XG", "2XG"],
-        "categoria": "Camisetas",
-        "medidas": [
-            {"tamanho": "P", "Q": 82, "A": 108, "L": 35.5},
-            {"tamanho": "M", "Q": 84, "A": 109, "L": 36.5},
-            {"tamanho": "G", "Q": 90, "A": 112, "L": 38},
-            {"tamanho": "GG", "Q": 94, "A": 112, "L": 39},
-            {"tamanho": "XG", "Q": 98, "A": 113, "L": 40.5},
-            {"tamanho": "2XG", "Q": 102, "A": 114, "L": 40.5},
-        ],
-    },
-    3: {
-        "id": 3,
-        "nome": "camisa boxy light bite drop3",
-        "titulo": "Camisa Boxy Light Bite Drop 03",
-        "preco": 149.90,
-        "imagem": "imagens/camisas/camisa 3.jpg",
-        "descricao": "Edição leve com visual clean, caimento amplo e acabamento premium para compor looks street.",
-        "tamanhos": ["P", "M", "G", "GG", "XG", "2XG"],
-        "categoria": "Camisetas",
-        "medidas": [
-            {"tamanho": "P", "Q": 84, "A": 110, "L": 36},
-            {"tamanho": "M", "Q": 86, "A": 111, "L": 37},
-            {"tamanho": "G", "Q": 92, "A": 113, "L": 38},
-            {"tamanho": "GG", "Q": 96, "A": 114, "L": 39},
-            {"tamanho": "XG", "Q": 100, "A": 115, "L": 40},
-            {"tamanho": "2XG", "Q": 104, "A": 116, "L": 40.5},
-        ],
-    },
-    4: {
-        "id": 4,
-        "nome": "conjunto cinza street drop1",
-        "titulo": "Conjunto Cinza Street Drop 01",
-        "preco": 289.90,
-        "imagem": "imagens/blusas_Conjuntos/conjunto moletom cinza.jpg",
-        "descricao": "Moletom pesado com capuz e calça cargo em modelo confortável, ideal para clima frio e uso casual.",
-        "tamanhos": ["P", "M", "G", "GG", "XG"],
-        "categoria": "Conjuntos",
-        "medidas": [
-            {"tamanho": "P", "Q": 83.5, "A": 111, "L": 36.5},
-            {"tamanho": "M", "Q": 85.5, "A": 112, "L": 37.5},
-            {"tamanho": "G", "Q": 93, "A": 113, "L": 38.5},
-            {"tamanho": "GG", "Q": 95, "A": 113, "L": 39.5},
-            {"tamanho": "XG", "Q": 99, "A": 114, "L": 41},
-            {"tamanho": "2XG", "Q": 104, "A": 115, "L": 41},
-        ],
-    },
-    5: {
-        "id": 5,
-        "nome": "conjunto UK drop2",
-        "titulo": "Conjunto UK Drop 02",
-        "preco": 299.90,
-        "imagem": "imagens/blusas_Conjuntos/USA.jpg",
-        "descricao": "Visual urbano e com textura premium, ideal para compor um outfit monotonal com presença elevada.",
-        "tamanhos": ["P", "M", "G", "GG", "XG"],
-        "categoria": "Conjuntos",
-        "medidas": [
-            {"tamanho": "P", "Q": 82.5, "A": 109, "L": 35.5},
-            {"tamanho": "M", "Q": 84.5, "A": 110, "L": 36.5},
-            {"tamanho": "G", "Q": 91, "A": 112, "L": 37.5},
-            {"tamanho": "GG", "Q": 94, "A": 112, "L": 38.5},
-            {"tamanho": "XG", "Q": 98, "A": 113, "L": 40},
-            {"tamanho": "2XG", "Q": 103, "A": 114, "L": 41},
-        ],
-    },
-    6: {
-        "id": 6,
-        "nome": "conjunto branco street drop3",
-        "titulo": "Conjunto Branco Street Drop 03",
-        "preco": 319.90,
-        "imagem": "imagens/blusas_Conjuntos/conjunto branco copy.jpg",
-        "descricao": "Estilo minimalista com acabamento refinado, tecido macio e caimento confortável para o dia a dia.",
-        "tamanhos": ["P", "M", "G", "GG", "XG"],
-        "categoria": "Conjuntos",
-        "medidas": [
-            {"tamanho": "P", "Q": 83, "A": 110, "L": 36},
-            {"tamanho": "M", "Q": 85, "A": 111, "L": 37},
-            {"tamanho": "G", "Q": 92, "A": 113, "L": 38},
-            {"tamanho": "GG", "Q": 96, "A": 113, "L": 39},
-            {"tamanho": "XG", "Q": 100, "A": 114, "L": 40.5},
-            {"tamanho": "2XG", "Q": 104, "A": 115, "L": 41},
-        ],
-    },
-    7: {
-        "id": 7,
-        "nome": "conjunto blue street drop4",
-        "titulo": "Conjunto Blue Street Drop 04",
-        "preco": 329.90,
-        "imagem": "imagens/blusas_Conjuntos/conj2.jpg",
-        "descricao": "Conjunto em tom azul com visual esportivo e premium, pensado para quem busca presença e conforto.",
-        "tamanhos": ["P", "M", "G", "GG", "XG"],
-        "categoria": "Conjuntos",
-        "medidas": [
-            {"tamanho": "P", "Q": 82, "A": 109, "L": 35.5},
-            {"tamanho": "M", "Q": 84, "A": 110, "L": 36.5},
-            {"tamanho": "G", "Q": 90, "A": 111, "L": 37.5},
-            {"tamanho": "GG", "Q": 93, "A": 112, "L": 38.5},
-            {"tamanho": "XG", "Q": 98, "A": 113, "L": 39.5},
-            {"tamanho": "2XG", "Q": 102, "A": 114, "L": 40.5},
-        ],
-    },
-    8: {
-        "id": 8,
-        "nome": "conjunto camuflado street drop5",
-        "titulo": "Conjunto Camuflado Street Drop 05",
-        "preco": 339.90,
-        "imagem": "imagens/blusas_Conjuntos/conj3.jpg",
-        "descricao": "Estampa camuflada com visual robusto, capuz reforçado e estrutura ideal para o clima urbano.",
-        "tamanhos": ["P", "M", "G", "GG", "XG"],
-        "categoria": "Conjuntos",
-        "medidas": [
-            {"tamanho": "P", "Q": 84, "A": 110, "L": 36.5},
-            {"tamanho": "M", "Q": 86, "A": 111, "L": 37.5},
-            {"tamanho": "G", "Q": 92, "A": 112, "L": 38.5},
-            {"tamanho": "GG", "Q": 95, "A": 113, "L": 39.5},
-            {"tamanho": "XG", "Q": 99, "A": 114, "L": 41},
-            {"tamanho": "2XG", "Q": 104, "A": 115, "L": 41.5},
-        ],
-    },
-    9: {
-        "id": 9,
-        "nome": "conjunto cimento street drop6",
-        "titulo": "Conjunto Cimento Street Drop 06",
-        "preco": 349.90,
-        "imagem": "imagens/blusas_Conjuntos/conj4.jpg",
-        "descricao": "Tom cimento com acabamento refinado, caimento largo e visual sofisticado para uso frequente.",
-        "tamanhos": ["P", "M", "G", "GG", "XG"],
-        "categoria": "Conjuntos",
-        "medidas": [
-            {"tamanho": "P", "Q": 83.5, "A": 110, "L": 36},
-            {"tamanho": "M", "Q": 85.5, "A": 111, "L": 37},
-            {"tamanho": "G", "Q": 92, "A": 112, "L": 38},
-            {"tamanho": "GG", "Q": 96, "A": 113, "L": 39},
-            {"tamanho": "XG", "Q": 100, "A": 114, "L": 40},
-            {"tamanho": "2XG", "Q": 105, "A": 115, "L": 41},
-        ],
-    },
-    10: {
-        "id": 10,
-        "nome": "calça moletom letringg drop7",
-        "titulo": "Calça de Moletom Letringg Drop 07",
-        "preco": 239.90,
-        "imagem": "imagens/calcas/Calça Moletom.jpg",
-        "descricao": "Calça de moletom com conforto premium, elástico e modelagem moderna para um visual casual e estável.",
-        "tamanhos": ["P", "M", "G", "GG", "XG"],
-        "categoria": "Calças",
-        "medidas": [
-            {"tamanho": "P", "Q": 83.5, "A": 111, "L": 36.5},
-            {"tamanho": "M", "Q": 85.5, "A": 112, "L": 37.5},
-            {"tamanho": "G", "Q": 93, "A": 113, "L": 38.5},
-            {"tamanho": "GG", "Q": 95, "A": 113, "L": 39.5},
-            {"tamanho": "XG", "Q": 99, "A": 114, "L": 41},
-            {"tamanho": "2XG", "Q": 104, "A": 115, "L": 41},
-        ],
-    },
-    11: {
-        "id": 11,
-        "nome": "calça moletom branca drop8",
-        "titulo": "Calça de Moletom Branca Drop 08",
-        "preco": 247.90,
-        "imagem": "imagens/calcas/calça branca.jpg",
-        "descricao": "Visual clean e contemporâneo, com tecido confortável e ajuste que favorece a modelagem ampla.",
-        "tamanhos": ["P", "M", "G", "GG", "XG"],
-        "categoria": "Calças",
-        "medidas": [
-            {"tamanho": "P", "Q": 82.5, "A": 109, "L": 35.5},
-            {"tamanho": "M", "Q": 84.5, "A": 110, "L": 36.5},
-            {"tamanho": "G", "Q": 91, "A": 111, "L": 37.5},
-            {"tamanho": "GG", "Q": 94, "A": 112, "L": 38.5},
-            {"tamanho": "XG", "Q": 98, "A": 113, "L": 40},
-            {"tamanho": "2XG", "Q": 102, "A": 114, "L": 41},
-        ],
-    },
-    12: {
-        "id": 12,
-        "nome": "calça moletom azul drop9",
-        "titulo": "Calça de Moletom Azul Drop 09",
-        "preco": 249.90,
-        "imagem": "imagens/calcas/calça azul.jpg",
-        "descricao": "Corte de calça com visual esportivo, acabamento versátil e toque macio para o uso diário.",
-        "tamanhos": ["P", "M", "G", "GG", "XG"],
-        "categoria": "Calças",
-        "medidas": [
-            {"tamanho": "P", "Q": 83, "A": 110, "L": 36},
-            {"tamanho": "M", "Q": 85, "A": 111, "L": 37},
-            {"tamanho": "G", "Q": 92, "A": 112, "L": 38},
-            {"tamanho": "GG", "Q": 95, "A": 113, "L": 39},
-            {"tamanho": "XG", "Q": 99, "A": 114, "L": 40.5},
-            {"tamanho": "2XG", "Q": 104, "A": 115, "L": 41},
-        ],
-    },
-}
-
-# Mantém só as medidas dos tamanhos que o produto realmente vende
-# (ex.: os conjuntos não têm 2XG, então a medida 2XG some da tabela).
-for _p in PRODUTOS.values():
-    _p["medidas"] = [m for m in _p["medidas"] if m["tamanho"] in _p["tamanhos"]]
-
-
-# ----------------------------------------------------------------------------
-# AUXILIARES
-# ----------------------------------------------------------------------------
-def login_obrigatorio(func):
-    """Redireciona para o login se o usuário não estiver logado."""
-    @wraps(func)
-    def wrapper(*args, **kwargs):
-        if "usuario_id" not in session:
-            return redirect(url_for("login"))
-        return func(*args, **kwargs)
-    return wrapper
-
-
-def iniciar_sessao(usuario):
-    session["usuario_id"] = usuario["id"]
-    session["usuario_nome"] = usuario["nome"]
-    session["usuario_email"] = usuario["email"]
-
-
-# ----------------------------------------------------------------------------
-# PÁGINAS
-# ----------------------------------------------------------------------------
-@app.route("/")
-def index():
-    return render_template("index.html")
-
-
-@app.route("/inicio")
-def inicio():
-    return render_template("inicio.html")
-
-
-@app.route("/produto/<int:produto_id>")
-def produto(produto_id):
-    produto_selecionado = PRODUTOS.get(produto_id)
-
-    if produto_selecionado is None:
-        return "Produto não encontrado", 404
-
-    return render_template("produto.html", produto=produto_selecionado)
-
-
-# ----------------------------------------------------------------------------
-# CADASTRO
-# ----------------------------------------------------------------------------
-@app.route("/registro", methods=["GET", "POST"])
-def registro():
-    if request.method == "POST":
-        nome = request.form.get("nome", "").strip()
-        email = request.form.get("email", "").strip().lower()
-        telefone = request.form.get("telefone", "").strip()
-        cep = re.sub(r"\D", "", request.form.get("cep", ""))
-        senha = request.form.get("senha", "")
-        confirmar_senha = request.form.get("confirmarSenha", "")
-
-        erros = []
-
-        if not re.fullmatch(NOME_REGEX, nome):
-            erros.append("Nome inválido. Use apenas letras e espaços (mínimo 3).")
-
-        if not re.fullmatch(EMAIL_REGEX, email):
-            erros.append("E-mail inválido.")
-
-        telefone_numeros = re.sub(r"\D", "", telefone)
-        if len(telefone_numeros) < 10 or len(telefone_numeros) > 11:
-            erros.append("Telefone inválido. Deve ter 10 ou 11 dígitos.")
-
-        if len(cep) != 8:
-            erros.append("CEP inválido. Deve ter 8 números.")
-
-        if len(senha) < 6:
-            erros.append("A senha deve ter no mínimo 6 caracteres.")
-
-        if senha != confirmar_senha:
-            erros.append("As senhas não coincidem.")
-
-        if erros:
-            return render_template("registro.html", erros=erros)
-
-        senha_hash = generate_password_hash(senha, method="pbkdf2:sha256")
-
-        conexao = None
-        cursor = None
-        try:
-            conexao = conectar_mysql()
-            cursor = conexao.cursor(dictionary=True)
-
-            cursor.execute(
-                """
-                INSERT INTO usuarios (nome, email, telefone, senha)
-                VALUES (%s, %s, %s, %s)
-                """,
-                (nome, email, telefone_numeros, senha_hash),
-            )
-            conexao.commit()
-
-        except mysql.connector.IntegrityError:
-            if conexao:
-                conexao.rollback()
-            return render_template("registro.html", erros=["Este e-mail já está cadastrado."])
-        except mysql.connector.Error:
-            log.exception("Erro ao cadastrar usuário")
-            if conexao:
-                conexao.rollback()
-            return render_template(
-                "registro.html",
-                erros=["Não foi possível concluir o cadastro. Tente novamente."],
-            )
-        finally:
-            if cursor:
-                cursor.close()
-            if conexao:
-                conexao.close()
-
-        # Cadastro concluído: volta para a tela de login
-        return redirect(url_for("login"))
-
-    return render_template("registro.html")
-
-
-# ----------------------------------------------------------------------------
-# LOGIN / LOGOUT
-# ----------------------------------------------------------------------------
-@app.route("/login", methods=["GET", "POST"])
-def login():
-    if request.method == "POST":
-        email = request.form.get("email", "").strip().lower()
-        senha = request.form.get("senha", "")
-
-        erros = []
-
-        if not re.fullmatch(EMAIL_REGEX, email):
-            erros.append("E-mail inválido.")
-
-        if not senha:
-            erros.append("Senha obrigatória.")
-
-        if erros:
-            return render_template("login.html", erros=erros)
-
-        conexao = None
-        cursor = None
-        try:
-            conexao = conectar_mysql()
-            cursor = conexao.cursor(dictionary=True)
-            cursor.execute(
-                "SELECT id, nome, email, senha FROM usuarios WHERE email = %s",
-                (email,),
-            )
-            usuario = cursor.fetchone()
-        except mysql.connector.Error:
-            log.exception("Erro no login")
-            return render_template(
-                "login.html",
-                erros=["Erro ao acessar o sistema. Tente novamente."],
-            )
-        finally:
-            if cursor:
-                cursor.close()
-            if conexao:
-                conexao.close()
-
-        senha_ok = False
-        if usuario:
-            try:
-                senha_ok = check_password_hash(usuario["senha"], senha)
-            except Exception:
-                # hash em formato inválido/não suportado no banco
-                log.exception("Hash de senha inválido para %s", email)
-
-        if senha_ok:
-            iniciar_sessao(usuario)
-            return redirect(url_for("index"))
-
-        if usuario is None:
-            log.info("Login falhou: e-mail %s não existe no banco", email)
-        else:
-            log.info("Login falhou: senha incorreta para %s", email)
-
-        return render_template("login.html", erros=["E-mail ou senha incorretos."])
-
-    return render_template("login.html")
-
-
-@app.route("/logout")
-def logout():
-    session.clear()
-    return redirect(url_for("index"))
-
-
-# ----------------------------------------------------------------------------
-# CARRINHO
-# ----------------------------------------------------------------------------
-@app.route("/carrinho/adicionar", methods=["POST"])
-@login_obrigatorio
-def adicionar_carrinho():
-    produto_id = request.form.get("produto_id", type=int)
-    tamanho = request.form.get("tamanho", "")
-
-    if produto_id is None or produto_id not in PRODUTOS:
-        return "Produto inválido", 400
-
-    # O tamanho precisa existir NESTE produto (conjuntos não têm 2XG)
-    if tamanho not in PRODUTOS[produto_id]["tamanhos"]:
-        return "Tamanho inválido", 400
-
-    quantidade = request.form.get("quantidade", type=int)
-    if quantidade is None or quantidade < 1 or quantidade > 10:
-        return "Quantidade inválida", 400
-
-    conexao = None
-    cursor = None
-    try:
-        conexao = conectar_mysql()
-        cursor = conexao.cursor()
-
-        # Mesmo produto + mesmo tamanho: soma a quantidade (máx. 10)
-        cursor.execute(
-            """
-            INSERT INTO carrinho (id_usuario, id_produto, tamanho, quantidade)
-            VALUES (%s, %s, %s, %s)
-            ON DUPLICATE KEY UPDATE quantidade = LEAST(quantidade + %s, 10)
-            """,
-            (session["usuario_id"], produto_id, tamanho, quantidade, quantidade),
-        )
-        conexao.commit()
-    except mysql.connector.Error:
-        log.exception("Erro ao adicionar ao carrinho")
-        if conexao:
-            conexao.rollback()
-        return "Não foi possível adicionar ao carrinho.", 500
-    finally:
-        if cursor:
-            cursor.close()
-        if conexao:
-            conexao.close()
-
-    return redirect(url_for("carrinho"))
-
-
-@app.route("/carrinho")
-@login_obrigatorio
-def carrinho():
-    conexao = None
-    cursor = None
-    linhas = []
-    try:
-        conexao = conectar_mysql()
-        cursor = conexao.cursor(dictionary=True)
-        cursor.execute(
-            """
-            SELECT id_carrinho, id_produto, tamanho, quantidade
-            FROM carrinho
-            WHERE id_usuario = %s
-            ORDER BY criado_em DESC
-            """,
-            (session["usuario_id"],),
-        )
-        linhas = cursor.fetchall()
-    except mysql.connector.Error:
-        log.exception("Erro ao carregar carrinho")
-    finally:
-        if cursor:
-            cursor.close()
-        if conexao:
-            conexao.close()
-
-    itens = []
-    total = 0.0
-    for linha in linhas:
-        p = PRODUTOS.get(linha["id_produto"])
-        if p is None:
-            continue
-        subtotal = p["preco"] * linha["quantidade"]
-        total += subtotal
-        itens.append(
-            {
-                "id_carrinho": linha["id_carrinho"],
-                "produto": p,
-                "tamanho": linha["tamanho"],
-                "quantidade": linha["quantidade"],
-                "subtotal": subtotal,
-            }
-        )
-
-    return render_template("carrinho.html", itens=itens, total=total)
-
-
-@app.route("/carrinho/remover/<int:id_carrinho>", methods=["POST"])
-@login_obrigatorio
-def remover_carrinho(id_carrinho):
-    conexao = None
-    cursor = None
-    try:
-        conexao = conectar_mysql()
-        cursor = conexao.cursor()
-        # Filtra também pelo usuário: ninguém remove item do carrinho de outro
-        cursor.execute(
-            "DELETE FROM carrinho WHERE id_carrinho = %s AND id_usuario = %s",
-            (id_carrinho, session["usuario_id"]),
-        )
-        conexao.commit()
-    except mysql.connector.Error:
-        log.exception("Erro ao remover item do carrinho")
-        if conexao:
-            conexao.rollback()
-    finally:
-        if cursor:
-            cursor.close()
-        if conexao:
-            conexao.close()
-
-    return redirect(url_for("carrinho"))
-
-
-# ----------------------------------------------------------------------------
-# PEDIDOS DOS CLIENTES (SELECT com INNER JOIN: pedidos + clientes)
-# ----------------------------------------------------------------------------
-@app.route("/pedidos")
-def listar_pedidos():
-    pedidos = []
-    erro = None
-    conexao = None
-    cursor = None
-    try:
-        conexao = conectar_mysql()
-        cursor = conexao.cursor(dictionary=True)
-        cursor.execute(
-            """
-            SELECT p.id_pedido, c.nome, c.cidade, c.estado,
-                   p.data_pedido, p.valor_total, p.status_pedido
-            FROM pedidos p
-            INNER JOIN clientes c ON c.id_cliente = p.id_cliente
-            ORDER BY p.data_pedido DESC
-            """
-        )
-        pedidos = cursor.fetchall()
-    except mysql.connector.Error:
-        log.exception("Erro ao listar pedidos")
-        erro = "Não foi possível carregar os pedidos. Tente novamente."
-    finally:
-        if cursor:
-            cursor.close()
-        if conexao:
-            conexao.close()
-
-    return render_template("pedidos.html", pedidos=pedidos, erro=erro)
-
-
-# ----------------------------------------------------------------------------
-# EXECUTAR
-# ----------------------------------------------------------------------------
-if __name__ == "__main__":
-    app.run(debug=os.environ.get("FLASK_DEBUG", "1") == "1")
+/* ============================================================================
+   PROJETO: Royal Drip (E-commerce de Moda / Streetwear)
+   INTEGRANTES: [Isabelly Vitoria, Ana Beatriz Cristofolette, Leticia Cristina, Thiago Barbosa, Arthur de Jesus]
+   DATA: 09/10/2026
+   ----------------------------------------------------------------------------
+   Usuários de teste (senhas já com hash do Werkzeug, o mesmo usado no Flask):
+     lucas@email.com  / 123456     (Cliente)
+     admin@email.com  / admin123   (Administrador)
+   ============================================================================ */
+
+-- ATENÇÃO: apaga o banco antigo e recria tudo do zero (evita conflito com as
+-- tabelas da versão anterior: clientes, produtos com tamanho/cor, senhas inválidas...).
+-- Se já tiver usuários cadastrados pelo site que quer manter, comente esta linha.
+DROP DATABASE IF EXISTS ROYAL_DRIP_SQL;
+
+CREATE DATABASE IF NOT EXISTS ROYAL_DRIP_SQL
+CHARACTER SET utf8mb4
+COLLATE utf8mb4_unicode_ci;
+
+USE ROYAL_DRIP_SQL;
+
+-- ----------------------------------------------------------------------------
+-- 1. ESTRUTURA
+-- ----------------------------------------------------------------------------
+
+-- Perfis de acesso (Cliente / Administrador)
+CREATE TABLE IF NOT EXISTS perfis (
+    id_perfil INT AUTO_INCREMENT PRIMARY KEY,
+    nome_perfil VARCHAR(30) NOT NULL UNIQUE
+) ENGINE=InnoDB;
+
+-- Os perfis precisam existir ANTES de qualquer usuário (chave estrangeira)
+INSERT INTO perfis (id_perfil, nome_perfil) VALUES
+(1, 'Cliente'),
+(2, 'Administrador')
+ON DUPLICATE KEY UPDATE nome_perfil = VALUES(nome_perfil);
+
+-- Usuários (única tabela de login/cadastro; substitui "clientes")
+CREATE TABLE IF NOT EXISTS usuarios (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    id_perfil INT NOT NULL DEFAULT 1,
+    nome VARCHAR(100) NOT NULL,
+    email VARCHAR(150) NOT NULL UNIQUE,
+    senha VARCHAR(255) NOT NULL,          -- hash gerado por generate_password_hash
+    telefone VARCHAR(20),
+    cidade VARCHAR(50),
+    estado CHAR(2),
+    criado_em DATETIME DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT fk_usuarios_perfis FOREIGN KEY (id_perfil) REFERENCES perfis(id_perfil)
+) ENGINE=InnoDB;
+
+-- Categorias
+CREATE TABLE IF NOT EXISTS categorias (
+    id_categoria INT AUTO_INCREMENT PRIMARY KEY,
+    nome_categoria VARCHAR(50) NOT NULL UNIQUE
+) ENGINE=InnoDB;
+
+-- Produtos (os mesmos 12 itens exibidos no site)
+-- O tamanho NÃO fica aqui: um produto tem vários tamanhos, que são escolhidos
+-- no carrinho / pedido.
+CREATE TABLE IF NOT EXISTS produtos (
+    id_produto INT AUTO_INCREMENT PRIMARY KEY,
+    id_categoria INT NOT NULL,
+    nome_produto VARCHAR(100) NOT NULL,
+    descricao TEXT,
+    preco DECIMAL(10,2) NOT NULL,
+    estoque INT NOT NULL DEFAULT 0,
+    imagem_url VARCHAR(255) DEFAULT 'default.jpg',
+    ativo BOOLEAN DEFAULT TRUE,
+    CONSTRAINT fk_produtos_categorias FOREIGN KEY (id_categoria) REFERENCES categorias(id_categoria)
+) ENGINE=InnoDB;
+
+-- Carrinho (um carrinho por usuário)
+CREATE TABLE IF NOT EXISTS carrinho (
+    id_carrinho INT AUTO_INCREMENT PRIMARY KEY,
+    id_usuario INT NOT NULL,
+    id_produto INT NOT NULL,
+    tamanho VARCHAR(10) NOT NULL,
+    quantidade INT NOT NULL DEFAULT 1,
+    criado_em DATETIME DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT fk_carrinho_usuarios FOREIGN KEY (id_usuario) REFERENCES usuarios(id) ON DELETE CASCADE,
+    CONSTRAINT fk_carrinho_produtos FOREIGN KEY (id_produto) REFERENCES produtos(id_produto),
+    -- mesmo produto + mesmo tamanho = mesma linha (soma a quantidade)
+    CONSTRAINT uq_carrinho_item UNIQUE (id_usuario, id_produto, tamanho)
+) ENGINE=InnoDB;
+
+-- Pedidos
+CREATE TABLE IF NOT EXISTS pedidos (
+    id_pedido INT AUTO_INCREMENT PRIMARY KEY,
+    id_usuario INT NOT NULL,
+    data_pedido DATETIME DEFAULT CURRENT_TIMESTAMP,
+    valor_total DECIMAL(10,2) NOT NULL,
+    status_pedido VARCHAR(30) DEFAULT 'Finalizado',
+    CONSTRAINT fk_pedidos_usuarios FOREIGN KEY (id_usuario) REFERENCES usuarios(id)
+) ENGINE=InnoDB;
+
+-- Itens do pedido
+CREATE TABLE IF NOT EXISTS itens_pedido (
+    id_item INT AUTO_INCREMENT PRIMARY KEY,
+    id_pedido INT NOT NULL,
+    id_produto INT NOT NULL,
+    tamanho VARCHAR(10) NOT NULL,
+    quantidade INT NOT NULL,
+    preco_unitario DECIMAL(10,2) NOT NULL,
+    CONSTRAINT fk_itens_pedidos FOREIGN KEY (id_pedido) REFERENCES pedidos(id_pedido),
+    CONSTRAINT fk_itens_produtos FOREIGN KEY (id_produto) REFERENCES produtos(id_produto),
+    CONSTRAINT uq_item_pedido UNIQUE (id_pedido, id_produto, tamanho)
+) ENGINE=InnoDB;
+
+
+-- ----------------------------------------------------------------------------
+-- 2. DADOS DE TESTE
+-- ----------------------------------------------------------------------------
+
+-- Categorias
+INSERT INTO categorias (id_categoria, nome_categoria) VALUES
+(1, 'Camisetas'),
+(2, 'Conjuntos'),
+(3, 'Calças')
+ON DUPLICATE KEY UPDATE nome_categoria = VALUES(nome_categoria);
+
+-- Usuários (senhas com hash real do Werkzeug)
+INSERT INTO usuarios (id, id_perfil, nome, email, senha, telefone, cidade, estado) VALUES
+(1, 1, 'Lucas Silva',    'lucas@email.com',    'pbkdf2:sha256:1000000$mqA4pKyZJP1B6mRS$79ac46cec917c58cdb643e15645562bfbc8d80067d796507c86a5848c9f064f1', '11999990001', 'São Paulo',      'SP'),
+(2, 1, 'Mariana Costa',  'mariana@email.com',  'pbkdf2:sha256:1000000$mqA4pKyZJP1B6mRS$79ac46cec917c58cdb643e15645562bfbc8d80067d796507c86a5848c9f064f1', '21999990002', 'Rio de Janeiro', 'RJ'),
+(3, 1, 'Felipe Andrade', 'felipe@email.com',  'pbkdf2:sha256:1000000$mqA4pKyZJP1B6mRS$79ac46cec917c58cdb643e15645562bfbc8d80067d796507c86a5848c9f064f1', '41999990003', 'Curitiba',       'PR'),
+(4, 1, 'Camila Rocha',   'camila@email.com',   'pbkdf2:sha256:1000000$mqA4pKyZJP1B6mRS$79ac46cec917c58cdb643e15645562bfbc8d80067d796507c86a5848c9f064f1', '31999990004', 'Belo Horizonte', 'MG'),
+(5, 2, 'Administrador',  'admin@email.com',    'pbkdf2:sha256:1000000$BhqbB0S7ZbvI9OBE$27dbba1897d2df8f36ddfa48f0cef4fdbaf2f43722d1ceb4d14e5c945cdb5d41', '11999990005', 'São Paulo',      'SP')
+ON DUPLICATE KEY UPDATE
+    nome = VALUES(nome),
+    id_perfil = VALUES(id_perfil),
+    senha = VALUES(senha);   -- redefine a senha dos usuários de teste
+
+-- Produtos: mesmos ids, nomes e preços do dicionário PRODUTOS do app.py
+INSERT INTO produtos (id_produto, id_categoria, nome_produto, descricao, preco, estoque, imagem_url) VALUES
+(1,  1, 'Camisa Boxy Dark Angel Drop 01',  'Modelagem ampla com corte streetwear moderno, algodão encorpado e acabamento premium.', 129.90, 45, 'imagens/camisas/camisa 1.jpg'),
+(2,  1, 'Camisa Boxy Black Bite Drop 02',  'Corte oversized com visual urbano, estampa marcante e tecido confortável.',             139.90, 40, 'imagens/camisas/camisa 2.jpg'),
+(3,  1, 'Camisa Boxy Light Bite Drop 03',  'Edição leve com visual clean, caimento amplo e acabamento premium.',                    149.90, 35, 'imagens/camisas/camisa 3.jpg'),
+(4,  2, 'Conjunto Cinza Street Drop 01',   'Moletom pesado com capuz e calça cargo, ideal para clima frio.',                        289.90, 20, 'imagens/blusas_Conjuntos/conjunto moletom cinza.jpg'),
+(5,  2, 'Conjunto UK Drop 02',             'Visual urbano com textura premium para um outfit monotonal.',                           299.90, 20, 'imagens/blusas_Conjuntos/USA.jpg'),
+(6,  2, 'Conjunto Branco Street Drop 03',  'Estilo minimalista com acabamento refinado e tecido macio.',                            319.90, 18, 'imagens/blusas_Conjuntos/conjunto branco copy.jpg'),
+(7,  2, 'Conjunto Blue Street Drop 04',    'Conjunto azul com visual esportivo e premium.',                                         329.90, 15, 'imagens/blusas_Conjuntos/conj2.jpg'),
+(8,  2, 'Conjunto Camuflado Street Drop 05','Estampa camuflada com visual robusto e capuz reforçado.',                              339.90, 15, 'imagens/blusas_Conjuntos/conj3.jpg'),
+(9,  2, 'Conjunto Cimento Street Drop 06', 'Tom cimento com acabamento refinado e caimento largo.',                                 349.90, 12, 'imagens/blusas_Conjuntos/conj4.jpg'),
+(10, 3, 'Calça de Moletom Letringg Drop 07','Calça de moletom com conforto premium e modelagem moderna.',                           239.90, 25, 'imagens/calcas/Calça Moletom.jpg'),
+(11, 3, 'Calça de Moletom Branca Drop 08', 'Visual clean e contemporâneo, com ajuste que favorece a modelagem ampla.',              247.90, 22, 'imagens/calcas/calça branca.jpg'),
+(12, 3, 'Calça de Moletom Azul Drop 09',   'Visual esportivo, acabamento versátil e toque macio.',                                  249.90, 22, 'imagens/calcas/calça azul.jpg')
+ON DUPLICATE KEY UPDATE
+    nome_produto = VALUES(nome_produto),
+    descricao    = VALUES(descricao),
+    preco        = VALUES(preco),
+    imagem_url   = VALUES(imagem_url);
+
+-- Pedidos (valor_total = soma dos itens abaixo)
+INSERT IGNORE INTO pedidos (id_pedido, id_usuario, data_pedido, valor_total, status_pedido) VALUES
+(1001, 1, '2026-10-01 10:30:00', 269.80, 'Finalizado'),   -- 129.90 + 139.90
+(1002, 2, '2026-10-02 14:15:00', 289.90, 'Finalizado'),   -- 289.90
+(1003, 1, '2026-10-04 18:00:00', 569.80, 'Finalizado'),   -- 239.90 + 329.90
+(1004, 3, '2026-10-05 11:20:00', 149.90, 'Finalizado');   -- 149.90
+
+-- Itens dos pedidos
+INSERT IGNORE INTO itens_pedido (id_pedido, id_produto, tamanho, quantidade, preco_unitario) VALUES
+(1001, 1,  'G',  1, 129.90),
+(1001, 2,  'M',  1, 139.90),
+(1002, 4,  'GG', 1, 289.90),
+(1003, 10, 'G',  1, 239.90),
+(1003, 7,  'M',  1, 329.90),
+(1004, 3,  'P',  1, 149.90);
+
+
+-- ============================================================================
+-- 3. RELATÓRIOS E TAREFAS ACADÊMICAS
+-- ============================================================================
+
+-- TAREFA 1: COUNT
+SELECT COUNT(id_produto) AS quantidade_itens_catalogo FROM produtos;
+
+-- TAREFA 2: SUM
+SELECT SUM(preco * estoque) AS valor_total_estoque_reais FROM produtos;
+
+-- TAREFA 3: AVG
+SELECT AVG(preco) AS preco_medio_pecas_reais FROM produtos;
+
+-- TAREFA 4: GROUP BY
+SELECT id_categoria, COUNT(id_produto) AS total_produtos, AVG(preco) AS preco_medio_categoria_reais
+FROM produtos
+GROUP BY id_categoria;
+
+-- TAREFA 5: INNER JOIN
+SELECT c.nome_categoria, p.nome_produto, ip.quantidade, ip.preco_unitario AS preco_unitario_reais
+FROM produtos p
+INNER JOIN categorias c ON p.id_categoria = c.id_categoria
+INNER JOIN itens_pedido ip ON p.id_produto = ip.id_produto;
+
+-- DESAFIO: INNER JOIN + GROUP BY
+SELECT c.nome_categoria,
+       SUM(ip.quantidade) AS total_pecas_vendidas,
+       SUM(ip.quantidade * ip.preco_unitario) AS faturamento_categoria_reais
+FROM categorias c
+INNER JOIN produtos p ON c.id_categoria = p.id_categoria
+INNER JOIN itens_pedido ip ON p.id_produto = ip.id_produto
+GROUP BY c.id_categoria, c.nome_categoria;
+
+
+-- ============================================================================
+-- 4. CONSULTAS ADICIONAIS (COUNT, SUM, AVG, GROUP BY, INNER JOIN)
+-- ============================================================================
+
+-- CONSULTA 1: COUNT + INNER JOIN + GROUP BY
+-- Quantidade de pedidos por cliente
+SELECT u.nome AS cliente,
+       COUNT(p.id_pedido) AS total_pedidos
+FROM usuarios u
+INNER JOIN pedidos p ON u.id = p.id_usuario
+GROUP BY u.id, u.nome
+ORDER BY total_pedidos DESC, u.nome;
+
+-- CONSULTA 2: SUM + INNER JOIN + GROUP BY
+-- Peças vendidas e faturamento por categoria
+SELECT c.nome_categoria AS categoria,
+       SUM(ip.quantidade) AS pecas_vendidas,
+       SUM(ip.quantidade * ip.preco_unitario) AS faturamento_reais
+FROM categorias c
+INNER JOIN produtos p      ON c.id_categoria = p.id_categoria
+INNER JOIN itens_pedido ip ON p.id_produto = ip.id_produto
+GROUP BY c.id_categoria, c.nome_categoria
+ORDER BY faturamento_reais DESC;
+
+-- CONSULTA 3: AVG + INNER JOIN + GROUP BY
+-- Ticket médio (valor médio dos pedidos) por cliente
+SELECT u.nome AS cliente,
+       ROUND(AVG(p.valor_total), 2) AS ticket_medio_reais
+FROM usuarios u
+INNER JOIN pedidos p ON u.id = p.id_usuario
+GROUP BY u.id, u.nome
+ORDER BY ticket_medio_reais DESC;
+
+-- CONSULTA 4: COUNT + AVG + SUM + GROUP BY
+-- Resumo do catálogo por categoria (qtd. de produtos, preço médio e estoque)
+SELECT c.nome_categoria AS categoria,
+       COUNT(p.id_produto) AS qtd_produtos,
+       ROUND(AVG(p.preco), 2) AS preco_medio_reais,
+       SUM(p.estoque) AS pecas_em_estoque
+FROM categorias c
+INNER JOIN produtos p ON c.id_categoria = p.id_categoria
+GROUP BY c.id_categoria, c.nome_categoria
+ORDER BY c.nome_categoria;
+
+-- CONSULTA 5: SUM + COUNT + INNER JOIN + GROUP BY
+-- Pedidos e faturamento por estado do cliente
+SELECT u.estado,
+       COUNT(p.id_pedido) AS total_pedidos,
+       SUM(p.valor_total) AS faturamento_reais
+FROM usuarios u
+INNER JOIN pedidos p ON u.id = p.id_usuario
+GROUP BY u.estado
+ORDER BY faturamento_reais DESC;
+
+-- CONSULTA DA TELA DE PEDIDOS DOS CLIENTES
+SELECT 
+    p.id_pedido,
+    p.data_pedido,
+    p.valor_total,
+    p.status_pedido AS status,
+    u.nome AS cliente_nome,
+    u.email AS cliente_email
+FROM pedidos p
+INNER JOIN usuarios u ON p.id_usuario = u.id
+ORDER BY p.data_pedido DESC;
+
+-- VERIFICAR A ESTRUTURA DA TABELA PEDIDOS
+DESCRIBE pedidos;

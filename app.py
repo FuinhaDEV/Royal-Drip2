@@ -32,7 +32,7 @@ def conectar_mysql():
 
 
 # ----------------------------------------------------------------------------
-# PRODUTOS (mesmos ids, nomes e preços da tabela `produtos` do SQL)
+# PRODUTOS (IDs de 1 a 24 cadastrados)
 # ----------------------------------------------------------------------------
 PRODUTOS = {
     1: {
@@ -40,7 +40,7 @@ PRODUTOS = {
         "nome": "camisa boxy dark angel drop1",
         "titulo": "Camisa Boxy Dark Angel Drop 01",
         "preco": 129.90,
-        "imagem": "imagens/camisas/camisa 1.jpg",
+        "imagem": "imagens/camisas/camisa 1.jpeg",
         "descricao": "Modelagem ampla com corte streetwear moderno, algodão encorpado e acabamento premium para o dia a dia com atitude.",
         "tamanhos": ["P", "M", "G", "GG", "XG", "2XG"],
         "categoria": "Camisetas",
@@ -58,7 +58,7 @@ PRODUTOS = {
         "nome": "camisa boxy black bite drop2",
         "titulo": "Camisa Boxy Black Bite Drop 02",
         "preco": 139.90,
-        "imagem": "imagens/camisas/camisa 2.jpg",
+        "imagem": "imagens/camisas/camisa 2.jpeg",
         "descricao": "Corte oversized com visual urbano, estampa marcante e tecido confortável para uso diário.",
         "tamanhos": ["P", "M", "G", "GG", "XG", "2XG"],
         "categoria": "Camisetas",
@@ -76,7 +76,7 @@ PRODUTOS = {
         "nome": "camisa boxy light bite drop3",
         "titulo": "Camisa Boxy Light Bite Drop 03",
         "preco": 149.90,
-        "imagem": "imagens/camisas/camisa 3.jpg",
+        "imagem": "imagens/camisas/camisa 3.jpeg",
         "descricao": "Edição leve com visual clean, caimento amplo e acabamento premium para compor looks street.",
         "tamanhos": ["P", "M", "G", "GG", "XG", "2XG"],
         "categoria": "Camisetas",
@@ -104,7 +104,6 @@ PRODUTOS = {
             {"tamanho": "G", "Q": 93, "A": 113, "L": 38.5},
             {"tamanho": "GG", "Q": 95, "A": 113, "L": 39.5},
             {"tamanho": "XG", "Q": 99, "A": 114, "L": 41},
-            {"tamanho": "2XG", "Q": 104, "A": 115, "L": 41},
         ],
     },
     5: {
@@ -122,7 +121,6 @@ PRODUTOS = {
             {"tamanho": "G", "Q": 91, "A": 112, "L": 37.5},
             {"tamanho": "GG", "Q": 94, "A": 112, "L": 38.5},
             {"tamanho": "XG", "Q": 98, "A": 113, "L": 40},
-            {"tamanho": "2XG", "Q": 103, "A": 114, "L": 41},
         ],
     },
     6: {
@@ -140,7 +138,6 @@ PRODUTOS = {
             {"tamanho": "G", "Q": 92, "A": 113, "L": 38},
             {"tamanho": "GG", "Q": 96, "A": 113, "L": 39},
             {"tamanho": "XG", "Q": 100, "A": 114, "L": 40.5},
-            {"tamanho": "2XG", "Q": 104, "A": 115, "L": 41},
         ],
     },
     7: {
@@ -158,7 +155,6 @@ PRODUTOS = {
             {"tamanho": "G", "Q": 90, "A": 111, "L": 37.5},
             {"tamanho": "GG", "Q": 93, "A": 112, "L": 38.5},
             {"tamanho": "XG", "Q": 98, "A": 113, "L": 39.5},
-            {"tamanho": "2XG", "Q": 102, "A": 114, "L": 40.5},
         ],
     },
     8: {
@@ -176,7 +172,6 @@ PRODUTOS = {
             {"tamanho": "G", "Q": 92, "A": 112, "L": 38.5},
             {"tamanho": "GG", "Q": 95, "A": 113, "L": 39.5},
             {"tamanho": "XG", "Q": 99, "A": 114, "L": 41},
-            {"tamanho": "2XG", "Q": 104, "A": 115, "L": 41.5},
         ],
     },
     9: {
@@ -194,7 +189,6 @@ PRODUTOS = {
             {"tamanho": "G", "Q": 92, "A": 112, "L": 38},
             {"tamanho": "GG", "Q": 96, "A": 113, "L": 39},
             {"tamanho": "XG", "Q": 100, "A": 114, "L": 40},
-            {"tamanho": "2XG", "Q": 105, "A": 115, "L": 41},
         ],
     },
     10: {
@@ -212,7 +206,6 @@ PRODUTOS = {
             {"tamanho": "G", "Q": 93, "A": 113, "L": 38.5},
             {"tamanho": "GG", "Q": 95, "A": 113, "L": 39.5},
             {"tamanho": "XG", "Q": 99, "A": 114, "L": 41},
-            {"tamanho": "2XG", "Q": 104, "A": 115, "L": 41},
         ],
     },
     11: {
@@ -230,7 +223,6 @@ PRODUTOS = {
             {"tamanho": "G", "Q": 91, "A": 111, "L": 37.5},
             {"tamanho": "GG", "Q": 94, "A": 112, "L": 38.5},
             {"tamanho": "XG", "Q": 98, "A": 113, "L": 40},
-            {"tamanho": "2XG", "Q": 102, "A": 114, "L": 41},
         ],
     },
     12: {
@@ -248,13 +240,195 @@ PRODUTOS = {
             {"tamanho": "G", "Q": 92, "A": 112, "L": 38},
             {"tamanho": "GG", "Q": 95, "A": 113, "L": 39},
             {"tamanho": "XG", "Q": 99, "A": 114, "L": 40.5},
-            {"tamanho": "2XG", "Q": 104, "A": 115, "L": 41},
+        ],
+    },
+    13: {
+        "id": 13,
+        "nome": "calça jeans baggy hard",
+        "titulo": "Calça Jeans Baggy Hard",
+        "preco": 269.90,
+        "imagem": "imagens/calcas/calça jeans hard 2.jpeg",
+        "descricao": "Modelagem baggy com jeans encorpado de alta gramatura, caimento largo e lavagem especial.",
+        "tamanhos": ["38", "40", "42", "44", "46"],
+        "categoria": "Calças",
+        "medidas": [
+            {"tamanho": "38", "Q": 80, "A": 108, "L": 34},
+            {"tamanho": "40", "Q": 84, "A": 110, "L": 35},
+            {"tamanho": "42", "Q": 88, "A": 112, "L": 36},
+            {"tamanho": "44", "Q": 92, "A": 114, "L": 37},
+            {"tamanho": "46", "Q": 96, "A": 115, "L": 38},
+        ],
+    },
+    14: {
+        "id": 14,
+        "nome": "calça jeans baggy worn out",
+        "titulo": "Calça Jeans Baggy Worn Out",
+        "preco": 279.90,
+        "imagem": "imagens/calcas/calça jeans hard.jpeg",
+        "descricao": "Visual vintage desgastado com estampa streetwear marcante e corte bem amplo nas pernas.",
+        "tamanhos": ["38", "40", "42", "44", "46"],
+        "categoria": "Calças",
+        "medidas": [
+            {"tamanho": "38", "Q": 81, "A": 108, "L": 34.5},
+            {"tamanho": "40", "Q": 85, "A": 110, "L": 35.5},
+            {"tamanho": "42", "Q": 89, "A": 112, "L": 36.5},
+            {"tamanho": "44", "Q": 93, "A": 114, "L": 37.5},
+            {"tamanho": "46", "Q": 97, "A": 115, "L": 38.5},
+        ],
+    },
+    15: {
+        "id": 15,
+        "nome": "calça regular bless",
+        "titulo": "Calça Regular Bless",
+        "preco": 259.90,
+        "imagem": "imagens/calcas/calça regular bless.png",
+        "descricao": "Corte reto contemporâneo com apliques em alto relevo e costuras reforçadas.",
+        "tamanhos": ["38", "40", "42", "44", "46"],
+        "categoria": "Calças",
+        "medidas": [
+            {"tamanho": "38", "Q": 80, "A": 107, "L": 33},
+            {"tamanho": "40", "Q": 84, "A": 109, "L": 34},
+            {"tamanho": "42", "Q": 88, "A": 111, "L": 35},
+            {"tamanho": "44", "Q": 92, "A": 113, "L": 36},
+            {"tamanho": "46", "Q": 96, "A": 114, "L": 37},
+        ],
+    },
+    16: {
+        "id": 16,
+        "nome": "calça jeans sant",
+        "titulo": "Calça Jeans Sant",
+        "preco": 289.90,
+        "imagem": "imagens/calcas/calça jeans sant.png",
+        "descricao": "Estampa sacra oversized impressa em jeans escuro com caimento solto e caimento street.",
+        "tamanhos": ["38", "40", "42", "44", "46"],
+        "categoria": "Calças",
+        "medidas": [
+            {"tamanho": "38", "Q": 82, "A": 109, "L": 35},
+            {"tamanho": "40", "Q": 86, "A": 111, "L": 36},
+            {"tamanho": "42", "Q": 90, "A": 113, "L": 37},
+            {"tamanho": "44", "Q": 94, "A": 115, "L": 38},
+            {"tamanho": "46", "Q": 98, "A": 116, "L": 39},
+        ],
+    },
+    17: {
+        "id": 17,
+        "nome": "calça jeans barrel",
+        "titulo": "Calça Jeans Barrel",
+        "preco": 249.90,
+        "imagem": "imagens/calcas/calça jeans barrel.png",
+        "descricao": "Modelagem Barrel curvada nas pernas com tom jeans escuro e costura contrastante amarela.",
+        "tamanhos": ["38", "40", "42", "44", "46"],
+        "categoria": "Calças",
+        "medidas": [
+            {"tamanho": "38", "Q": 79, "A": 106, "L": 34},
+            {"tamanho": "40", "Q": 83, "A": 108, "L": 35},
+            {"tamanho": "42", "Q": 87, "A": 110, "L": 36},
+            {"tamanho": "44", "Q": 91, "A": 112, "L": 37},
+            {"tamanho": "46", "Q": 95, "A": 113, "L": 38},
+        ],
+    },
+    18: {
+        "id": 18,
+        "nome": "calça baggy nation",
+        "titulo": "Calça Baggy Nation",
+        "preco": 299.90,
+        "imagem": "imagens/calcas/calça baggy nation.png",
+        "descricao": "Corte oversized com tipografia Nation e elementos gravados ao longo da perna esquerda.",
+        "tamanhos": ["38", "40", "42", "44", "46"],
+        "categoria": "Calças",
+        "medidas": [
+            {"tamanho": "38", "Q": 82, "A": 110, "L": 35.5},
+            {"tamanho": "40", "Q": 86, "A": 112, "L": 36.5},
+            {"tamanho": "42", "Q": 90, "A": 114, "L": 37.5},
+            {"tamanho": "44", "Q": 94, "A": 115, "L": 38.5},
+            {"tamanho": "46", "Q": 98, "A": 116, "L": 39.5},
+        ],
+    },
+    19: {
+        "id": 19,
+        "nome": "calça jeans baggy camuflada",
+        "titulo": "Calça Jeans Baggy Camuflada",
+        "preco": 269.90,
+        "imagem": "imagens/calcas/calça baggy camuflada.png",
+        "descricao": "Estampa camuflada militar em sarja encorpada com modelagem bem larga nas pernas.",
+        "tamanhos": ["38", "40", "42", "44", "46"],
+        "categoria": "Calças",
+        "medidas": [
+            {"tamanho": "38", "Q": 81, "A": 108, "L": 35},
+            {"tamanho": "40", "Q": 85, "A": 110, "L": 36},
+            {"tamanho": "42", "Q": 89, "A": 112, "L": 37},
+            {"tamanho": "44", "Q": 93, "A": 114, "L": 38},
+            {"tamanho": "46", "Q": 97, "A": 115, "L": 39},
+        ],
+    },
+    20: {
+        "id": 20,
+        "nome": "gorro oncinha y2k",
+        "titulo": "Gorro Oncinha Y2K",
+        "preco": 79.90,
+        "imagem": "imagens/gorros/gorro oncinha y2k.png",
+        "descricao": "Gorro em tricô macio com estampa animal print e modelagem anatômica urbana.",
+        "tamanhos": ["Único"],
+        "categoria": "Acessórios",
+        "medidas": [
+            {"tamanho": "Único", "Q": 54, "A": 22, "L": 20},
+        ],
+    },
+    21: {
+        "id": 21,
+        "nome": "gorro pré cort",
+        "titulo": "Gorro Pré Cort",
+        "preco": 89.90,
+        "imagem": "imagens/gorros/gorro pré cort.png",
+        "descricao": "Gorro em malha encorpada preta com bordado frontal amplo em relevo.",
+        "tamanhos": ["Único"],
+        "categoria": "Acessórios",
+        "medidas": [
+            {"tamanho": "Único", "Q": 54, "A": 22, "L": 20},
+        ],
+    },
+    22: {
+        "id": 22,
+        "nome": "gorro y2k black",
+        "titulo": "Gorro Y2K Black",
+        "preco": 79.90,
+        "imagem": "imagens/gorros/gorro y2k black.png",
+        "descricao": "Gorro preto minimalista estilo Y2K com bordado metálico prateado.",
+        "tamanhos": ["Único"],
+        "categoria": "Acessórios",
+        "medidas": [
+            {"tamanho": "Único", "Q": 54, "A": 22, "L": 20},
+        ],
+    },
+    23: {
+        "id": 23,
+        "nome": "gorro y2k white",
+        "titulo": "Gorro Y2K White",
+        "preco": 79.90,
+        "imagem": "imagens/gorros/gorro y2k white.png",
+        "descricao": "Edição branca em lã macia com estampa frontal estilo graffitero urbano.",
+        "tamanhos": ["Único"],
+        "categoria": "Acessórios",
+        "medidas": [
+            {"tamanho": "Único", "Q": 54, "A": 22, "L": 20},
+        ],
+    },
+    24: {
+        "id": 24,
+        "nome": "gorro white red",
+        "titulo": "Gorro White Red",
+        "preco": 84.90,
+        "imagem": "imagens/gorros/gorro white red.jpg",
+        "descricao": "Gorro com estampa em contraste vermelho e branco e tecido térmico de alta durabilidade.",
+        "tamanhos": ["Único"],
+        "categoria": "Acessórios",
+        "medidas": [
+            {"tamanho": "Único", "Q": 54, "A": 22, "L": 20},
         ],
     },
 }
 
-# Mantém só as medidas dos tamanhos que o produto realmente vende
-# (ex.: os conjuntos não têm 2XG, então a medida 2XG some da tabela).
+# Filtra medidas apenas para os tamanhos disponíveis no produto
 for _p in PRODUTOS.values():
     _p["medidas"] = [m for m in _p["medidas"] if m["tamanho"] in _p["tamanhos"]]
 
@@ -373,7 +547,6 @@ def registro():
             if conexao:
                 conexao.close()
 
-        # Cadastro concluído: volta para a tela de login
         return redirect(url_for("login"))
 
     return render_template("registro.html")
@@ -426,7 +599,6 @@ def login():
             try:
                 senha_ok = check_password_hash(usuario["senha"], senha)
             except Exception:
-                # hash em formato inválido/não suportado no banco
                 log.exception("Hash de senha inválido para %s", email)
 
         if senha_ok:
@@ -461,7 +633,6 @@ def adicionar_carrinho():
     if produto_id is None or produto_id not in PRODUTOS:
         return "Produto inválido", 400
 
-    # O tamanho precisa existir NESTE produto (conjuntos não têm 2XG)
     if tamanho not in PRODUTOS[produto_id]["tamanhos"]:
         return "Tamanho inválido", 400
 
@@ -475,7 +646,6 @@ def adicionar_carrinho():
         conexao = conectar_mysql()
         cursor = conexao.cursor()
 
-        # Mesmo produto + mesmo tamanho: soma a quantidade (máx. 10)
         cursor.execute(
             """
             INSERT INTO carrinho (id_usuario, id_produto, tamanho, quantidade)
@@ -555,7 +725,6 @@ def remover_carrinho(id_carrinho):
     try:
         conexao = conectar_mysql()
         cursor = conexao.cursor()
-        # Filtra também pelo usuário: ninguém remove item do carrinho de outro
         cursor.execute(
             "DELETE FROM carrinho WHERE id_carrinho = %s AND id_usuario = %s",
             (id_carrinho, session["usuario_id"]),
@@ -572,6 +741,41 @@ def remover_carrinho(id_carrinho):
             conexao.close()
 
     return redirect(url_for("carrinho"))
+
+
+# ----------------------------------------------------------------------------
+# PEDIDOS DOS CLIENTES
+# ----------------------------------------------------------------------------
+@app.route("/pedidos")
+def listar_pedidos():
+    pedidos = []
+    erro = None
+    conexao = None
+    cursor = None
+    try:
+        conexao = conectar_mysql()
+        cursor = conexao.cursor(dictionary=True)
+        cursor.execute(
+            """
+            SELECT p.id_pedido, c.nome, c.cidade, c.estado,
+                   p.data_pedido, p.valor_total, p.status_pedido
+            FROM pedidos p
+            INNER JOIN clientes c ON c.id_cliente = p.id_cliente
+            ORDER BY p.data_pedido DESC
+            """
+        )
+        pedidos = cursor.fetchall()
+    except mysql.connector.Error:
+        log.exception("Erro ao listar pedidos")
+        erro = "Não foi possível carregar os pedidos. Tente novamente."
+    finally:
+        if cursor:
+            cursor.close()
+        if conexao:
+            conexao.close()
+
+    return render_template("pedidos.html", pedidos=pedidos, erro=erro)
+
 
 
 # ----------------------------------------------------------------------------
