@@ -1,0 +1,157 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Pagamento - Loja de Roupas</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}" />
+  </head>
+  <body>
+    <div class="container">
+      <h2>Tela de Pagamento</h2>
+
+      <!-- Resumo do Pedido -->
+      <div class="resumo">
+        <p><strong>Loja:</strong> Moda & Estilo</p>
+        <p><strong>Produto:</strong> Camiseta Oversized + Calça Jeans</p>
+        <p class="total">Total: R$ 189,90</p>
+      </div>
+
+      <!-- Escolha do Método de Pagamento -->
+      <label for="metodo">Escolha a forma de pagamento:</label>
+      <select id="metodo" onchange="mudarMetodo()">
+        <option value="credito">Cartão de Crédito</option>
+        <option value="debito">Cartão de Débito</option>
+        <option value="pix">PIX</option>
+        <option value="boleto">Boleto Bancário</option>
+      </select>
+
+      <form onsubmit="finalizarPagamento(event)">
+        <!-- Formulário de Cartão (Crédito ou Débito) -->
+        <div id="form-cartao">
+          <label for="nome-cartao">Nome impresso no cartão</label>
+          <input
+            type="text"
+            id="nome-cartao"
+            placeholder="Ex: MARIA A SILVA"
+            required
+          />
+
+          <label for="numero-cartao">Número do Cartão</label>
+          <input
+            type="text"
+            id="numero-cartao"
+            placeholder="0000 0000 0000 0000"
+            maxlength="19"
+            required
+          />
+
+          <div class="linha-dupla">
+            <div>
+              <label for="validade">Validade</label>
+              <input
+                type="text"
+                id="validade"
+                placeholder="MM/AA"
+                maxlength="5"
+                required
+              />
+            </div>
+            <div>
+              <label for="cvv">CVV</label>
+              <input
+                type="text"
+                id="cvv"
+                placeholder="123"
+                maxlength="4"
+                required
+              />
+            </div>
+          </div>
+
+          <!-- Opção de parcelas visível apenas no Crédito -->
+          <div id="campo-parcelas">
+            <label for="parcelas">Parcelas</label>
+            <select id="parcelas">
+              <option value="1">1x de R$ 189,90 sem juros</option>
+              <option value="2">2x de R$ 94,95 sem juros</option>
+              <option value="3">3x de R$ 63,30 sem juros</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Informações do PIX -->
+        <div id="form-pix" class="escondido info-box">
+          <p><strong>Pagamento via PIX</strong></p>
+          <p>
+            Ao clicar em "Finalizar", o código QR Code será gerado para
+            pagamento instantâneo.
+          </p>
+          <p><em>Desconto de 5% aplicado no PIX!</em></p>
+        </div>
+
+        <!-- Informações do Boleto -->
+        <div id="form-boleto" class="escondido info-box">
+          <p><strong>Pagamento via Boleto Bancário</strong></p>
+          <p>
+            O boleto será gerado após a confirmação. O prazo de compensação é de
+            até 3 dias úteis.
+          </p>
+        </div>
+
+        <!-- Botão para enviar o formulário -->
+        <button type="submit" class="btn-pagar">Finalizar Pagamento</button>
+      </form>
+    </div>
+
+    <script>
+      // Função para mostrar/ocultar os campos de acordo com a opção escolhida
+      function mudarMetodo() {
+        const metodo = document.getElementById("metodo").value;
+        const formCartao = document.getElementById("form-cartao");
+        const formPix = document.getElementById("form-pix");
+        const formBoleto = document.getElementById("form-boleto");
+        const campoParcelas = document.getElementById("campo-parcelas");
+
+        const inputsCartao = formCartao.querySelectorAll("input");
+
+        // Oculta todas as opções inicialmente
+        formCartao.classList.add("escondido");
+        formPix.classList.add("escondido");
+        formBoleto.classList.add("escondido");
+
+        // Remove a obrigatoriedade dos campos de cartão
+        inputsCartao.forEach((input) => input.removeAttribute("required"));
+
+        // Exibe a opção selecionada
+        if (metodo === "credito") {
+          formCartao.classList.remove("escondido");
+          campoParcelas.classList.remove("escondido");
+          inputsCartao.forEach((input) =>
+            input.setAttribute("required", "true"),
+          );
+        } else if (metodo === "debito") {
+          formCartao.classList.remove("escondido");
+          campoParcelas.classList.add("escondido"); // Débito não tem parcelamento
+          inputsCartao.forEach((input) =>
+            input.setAttribute("required", "true"),
+          );
+        } else if (metodo === "pix") {
+          formPix.classList.remove("escondido");
+        } else if (metodo === "boleto") {
+          formBoleto.classList.remove("escondido");
+        }
+      }
+
+      // Função executada ao clicar no botão de pagar 
+      function finalizarPagamento(event) {
+        event.preventDefault(); // Impede o recarregamento da página
+        const metodo = document.getElementById("metodo").value;
+        alert(
+          "Pagamento enviado com sucesso usando o método: " +
+            metodo.toUpperCase(),
+        );
+      }
+    </script>
+  </body>
+</html>

@@ -1,0 +1,105 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Pedidos | Royal Drip</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}" />
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/pedidos.css') }}" />
+  </head>
+  <body>
+    <!-- Cabeçalho igual ao da página inicial -->
+    <header class="cabecalho">
+      <div class="header-icons">
+        <a href="{{ url_for('registro') }}" aria-label="Minha conta" class="icon-link">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="black"
+            stroke-width="1.5"
+          >
+            <circle cx="12" cy="8" r="3.5" />
+            <path d="M5 20c0-3.5 3-6 7-6s7 2.5 7 6" />
+          </svg>
+        </a>
+
+        <a href="{{ url_for('carrinho') }}" aria-label="Carrinho de compras" class="icon-link">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="black"
+            stroke-width="1.5"
+          >
+            <path d="M6 8h12l-1 12H7L6 8z" />
+            <path d="M9 8V6a3 3 0 0 1 6 0v2" />
+          </svg>
+        </a>
+      </div>
+
+      <div class="logo">
+        <img
+          class="brand-image"
+          src="{{ url_for('static', filename='imagens/Logo Marca/Logo marca (1).png') }}"
+          alt="Royal Drip"
+        />
+      </div>
+
+      <nav>
+        <ul>
+          <li><a href="{{ url_for('index') }}">Início</a></li>
+          <li><a href="{{ url_for('listar_pedidos') }}">Pedidos</a></li>
+        </ul>
+      </nav>
+    </header>
+
+    <main class="pedidos-page">
+      <h1 class="pedidos-titulo">Pedidos dos clientes</h1>
+      <p class="pedidos-subtitulo">
+        Pedidos registrados na loja, com os dados de cada cliente.
+      </p>
+
+      {% if erro %}
+        <div class="alerta alerta-erro pedidos-aviso">{{ erro }}</div>
+      {% elif pedidos %}
+        <div class="pedidos-card">
+          <table class="tabela-pedidos">
+            <thead>
+              <tr>
+                <th>Pedido</th>
+                <th>Cliente</th>
+                <th>Cidade/UF</th>
+                <th>Data</th>
+                <th>Status</th>
+                <th class="col-direita">Total</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for p in pedidos %}
+              <tr>
+                <td data-label="Pedido" class="pedido-numero">#{{ p.id_pedido }}</td>
+                <td data-label="Cliente">{{ p.nome }}</td>
+                <td data-label="Cidade/UF">{{ p.cidade }}/{{ p.estado }}</td>
+                <td data-label="Data">{{ p.data_pedido.strftime("%d/%m/%Y %H:%M") if p.data_pedido else "-" }}</td>
+                <td data-label="Status"><span class="status">{{ p.status_pedido or "-" }}</span></td>
+                <td data-label="Total" class="pedido-valor col-direita">R$ {{ "%.2f"|format(p.valor_total)|replace(".", ",") }}</td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      {% else %}
+        <div class="alerta alerta-vazio pedidos-aviso">
+          Nenhum pedido cadastrado até o momento.
+        </div>
+      {% endif %}
+
+      <a class="voltar" href="{{ url_for('index') }}">&larr; Voltar para a loja</a>
+    </main>
+
+    <footer>
+      <p>&copy; 2026 Royal Drip Streetwear. Todos os direitos reservados.</p>
+    </footer>
+  </body>
+</html>

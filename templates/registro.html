@@ -7,10 +7,10 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}" />
     <script>
       function validarFormulario() {
-        let nome = document.getElementById("nome").value;
-        let telefone = document.getElementById("telefone").value;
-        let email = document.getElementById("email").value;
-        let cep = document.getElementById("cep").value;
+        let nome = document.getElementById("nome").value.trim();
+        let telefone = document.getElementById("telefone").value.replace(/\D/g, "");
+        let email = document.getElementById("email").value.trim();
+        let cep = document.getElementById("cep").value.replace(/\D/g, "");
         let senha = document.getElementById("senha").value;
         let confirmarSenha = document.getElementById("confirmarSenha").value;
 
@@ -31,8 +31,8 @@
           return false;
         }
 
-        if (telefone.length < 10) {
-          alert("Telefone inválido!");
+        if (telefone.length < 10 || telefone.length > 11) {
+          alert("Telefone inválido! Use DDD + número (10 ou 11 dígitos).");
           return false;
         }
 
@@ -51,7 +51,7 @@
           return false;
         }
 
-        alert("Cadastro realizado com sucesso!");
+        // Tudo certo: o formulário é enviado ao servidor (o Flask confirma o cadastro).
         return true;
       }
     </script>
@@ -81,12 +81,29 @@
         <h1 class="registro-titulo">Criar uma Conta</h1>
         <p class="registro-subtitulo">Cadastre-se e comece a comprar</p>
 
-        <form class="registro-form" onsubmit="return validarFormulario();">
+        {% if erros %}
+          <div class="alertas">
+            {% for erro in erros %}
+              <div class="alerta alerta-erro">
+                ⚠️ {{ erro }}
+              </div>
+            {% endfor %}
+          </div>
+        {% endif %}
+
+        <!-- method="post" e action são obrigatórios: sem eles o navegador envia por GET
+             e o Flask nunca recebe os dados para gravar no banco -->
+        <form
+          class="registro-form"
+          method="post"
+          action="{{ url_for('registro') }}"
+          onsubmit="return validarFormulario();"
+        >
           <div class="form-group">
             <label for="nome">Nome Completo</label>
-            <input 
-              type="text" 
-              id="nome" 
+            <input
+              type="text"
+              id="nome"
               name="nome"
               placeholder="Ex.: Maria Perez"
               required
@@ -95,9 +112,9 @@
 
           <div class="form-group">
             <label for="email">E-mail</label>
-            <input 
-              type="email" 
-              id="email" 
+            <input
+              type="email"
+              id="email"
               name="email"
               placeholder="seu@email.com.br"
               required
@@ -106,9 +123,9 @@
 
           <div class="form-group">
             <label for="telefone">Telefone</label>
-            <input 
-              type="tel" 
-              id="telefone" 
+            <input
+              type="tel"
+              id="telefone"
               name="telefone"
               placeholder="11999999999"
               required
@@ -117,9 +134,9 @@
 
           <div class="form-group">
             <label for="cep">CEP</label>
-            <input 
-              type="text" 
-              id="cep" 
+            <input
+              type="text"
+              id="cep"
               name="cep"
               placeholder="00000000"
               maxlength="8"
@@ -129,9 +146,9 @@
 
           <div class="form-group">
             <label for="senha">Senha</label>
-            <input 
-              type="password" 
-              id="senha" 
+            <input
+              type="password"
+              id="senha"
               name="senha"
               placeholder="Mínimo 6 caracteres"
               required
@@ -140,9 +157,9 @@
 
           <div class="form-group">
             <label for="confirmarSenha">Confirmar Senha</label>
-            <input 
-              type="password" 
-              id="confirmarSenha" 
+            <input
+              type="password"
+              id="confirmarSenha"
               name="confirmarSenha"
               placeholder="Repita sua senha"
               required

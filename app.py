@@ -1,36 +1,46 @@
-from flask import Flask, render_template, request, redirect, url_for, session
-import mysql.connector
+import logging
+import os
 import re
-from werkzeug.security import generate_password_hash, check_password_hash
+from functools import wraps
+
+import mysql.connector
+from flask import Flask, redirect, render_template, request, session, url_for
+from werkzeug.security import check_password_hash, generate_password_hash
 
 app = Flask(__name__)
-app.secret_key = "royal_drip_secret_2024_chave_segura"
+
+# Em produção, defina estas variáveis de ambiente (os valores abaixo são só para desenvolvimento).
+app.secret_key = os.environ.get("SECRET_KEY", "royal_drip_dev_key_troque_em_producao")
+
+logging.basicConfig(level=logging.INFO)
+log = logging.getLogger("royal_drip")
+
+EMAIL_REGEX = r"^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$"
+NOME_REGEX = r"[A-Za-zÀ-ÿ\s]{3,100}"
 
 
+# ----------------------------------------------------------------------------
+# BANCO DE DADOS (uma única função de conexão)
+# ----------------------------------------------------------------------------
 def conectar_mysql():
     return mysql.connector.connect(
-        host="localhost",
-        user="root",        
-        password="senai105",  
-        database="DADOS_ROYAL_DRIP"
+        host=os.environ.get("DB_HOST", "localhost"),
+        user=os.environ.get("DB_USER", "root"),
+        password=os.environ.get("DB_PASSWORD", "senai105"),
+        database=os.environ.get("DB_NAME", "ROYAL_DRIP_SQL"),
     )
 
-# Rota Principal
-@app.route('/')
-def index():
-    return render_template('index.html')
 
-@app.route('/inicio')
-def inicio():
-    return render_template('inicio.html')
-
+# ----------------------------------------------------------------------------
+# PRODUTOS (IDs de 1 a 24 cadastrados)
+# ----------------------------------------------------------------------------
 PRODUTOS = {
     1: {
         "id": 1,
         "nome": "camisa boxy dark angel drop1",
         "titulo": "Camisa Boxy Dark Angel Drop 01",
         "preco": 129.90,
-        "imagem": "imagens/camisas/camisa 1.jpg",
+        "imagem": "imagens/camisas/camisa 1.jpeg",
         "descricao": "Modelagem ampla com corte streetwear moderno, algodão encorpado e acabamento premium para o dia a dia com atitude.",
         "tamanhos": ["P", "M", "G", "GG", "XG", "2XG"],
         "categoria": "Camisetas",
@@ -40,15 +50,15 @@ PRODUTOS = {
             {"tamanho": "G", "Q": 93, "A": 113, "L": 38.5},
             {"tamanho": "GG", "Q": 95, "A": 113, "L": 39.5},
             {"tamanho": "XG", "Q": 99, "A": 114, "L": 41},
-            {"tamanho": "2XG", "Q": 104, "A": 115, "L": 41}
-        ]
+            {"tamanho": "2XG", "Q": 104, "A": 115, "L": 41},
+        ],
     },
     2: {
         "id": 2,
         "nome": "camisa boxy black bite drop2",
         "titulo": "Camisa Boxy Black Bite Drop 02",
         "preco": 139.90,
-        "imagem": "imagens/camisas/camisa 2.jpg",
+        "imagem": "imagens/camisas/camisa 2.jpeg",
         "descricao": "Corte oversized com visual urbano, estampa marcante e tecido confortável para uso diário.",
         "tamanhos": ["P", "M", "G", "GG", "XG", "2XG"],
         "categoria": "Camisetas",
@@ -58,15 +68,15 @@ PRODUTOS = {
             {"tamanho": "G", "Q": 90, "A": 112, "L": 38},
             {"tamanho": "GG", "Q": 94, "A": 112, "L": 39},
             {"tamanho": "XG", "Q": 98, "A": 113, "L": 40.5},
-            {"tamanho": "2XG", "Q": 102, "A": 114, "L": 40.5}
-        ]
+            {"tamanho": "2XG", "Q": 102, "A": 114, "L": 40.5},
+        ],
     },
     3: {
         "id": 3,
         "nome": "camisa boxy light bite drop3",
         "titulo": "Camisa Boxy Light Bite Drop 03",
         "preco": 149.90,
-        "imagem": "imagens/camisas/camisa 3.jpg",
+        "imagem": "imagens/camisas/camisa 3.jpeg",
         "descricao": "Edição leve com visual clean, caimento amplo e acabamento premium para compor looks street.",
         "tamanhos": ["P", "M", "G", "GG", "XG", "2XG"],
         "categoria": "Camisetas",
@@ -76,8 +86,8 @@ PRODUTOS = {
             {"tamanho": "G", "Q": 92, "A": 113, "L": 38},
             {"tamanho": "GG", "Q": 96, "A": 114, "L": 39},
             {"tamanho": "XG", "Q": 100, "A": 115, "L": 40},
-            {"tamanho": "2XG", "Q": 104, "A": 116, "L": 40.5}
-        ]
+            {"tamanho": "2XG", "Q": 104, "A": 116, "L": 40.5},
+        ],
     },
     4: {
         "id": 4,
@@ -94,8 +104,7 @@ PRODUTOS = {
             {"tamanho": "G", "Q": 93, "A": 113, "L": 38.5},
             {"tamanho": "GG", "Q": 95, "A": 113, "L": 39.5},
             {"tamanho": "XG", "Q": 99, "A": 114, "L": 41},
-            {"tamanho": "2XG", "Q": 104, "A": 115, "L": 41}
-        ]
+        ],
     },
     5: {
         "id": 5,
@@ -112,8 +121,7 @@ PRODUTOS = {
             {"tamanho": "G", "Q": 91, "A": 112, "L": 37.5},
             {"tamanho": "GG", "Q": 94, "A": 112, "L": 38.5},
             {"tamanho": "XG", "Q": 98, "A": 113, "L": 40},
-            {"tamanho": "2XG", "Q": 103, "A": 114, "L": 41}
-        ]
+        ],
     },
     6: {
         "id": 6,
@@ -130,8 +138,7 @@ PRODUTOS = {
             {"tamanho": "G", "Q": 92, "A": 113, "L": 38},
             {"tamanho": "GG", "Q": 96, "A": 113, "L": 39},
             {"tamanho": "XG", "Q": 100, "A": 114, "L": 40.5},
-            {"tamanho": "2XG", "Q": 104, "A": 115, "L": 41}
-        ]
+        ],
     },
     7: {
         "id": 7,
@@ -148,8 +155,7 @@ PRODUTOS = {
             {"tamanho": "G", "Q": 90, "A": 111, "L": 37.5},
             {"tamanho": "GG", "Q": 93, "A": 112, "L": 38.5},
             {"tamanho": "XG", "Q": 98, "A": 113, "L": 39.5},
-            {"tamanho": "2XG", "Q": 102, "A": 114, "L": 40.5}
-        ]
+        ],
     },
     8: {
         "id": 8,
@@ -166,8 +172,7 @@ PRODUTOS = {
             {"tamanho": "G", "Q": 92, "A": 112, "L": 38.5},
             {"tamanho": "GG", "Q": 95, "A": 113, "L": 39.5},
             {"tamanho": "XG", "Q": 99, "A": 114, "L": 41},
-            {"tamanho": "2XG", "Q": 104, "A": 115, "L": 41.5}
-        ]
+        ],
     },
     9: {
         "id": 9,
@@ -184,8 +189,7 @@ PRODUTOS = {
             {"tamanho": "G", "Q": 92, "A": 112, "L": 38},
             {"tamanho": "GG", "Q": 96, "A": 113, "L": 39},
             {"tamanho": "XG", "Q": 100, "A": 114, "L": 40},
-            {"tamanho": "2XG", "Q": 105, "A": 115, "L": 41}
-        ]
+        ],
     },
     10: {
         "id": 10,
@@ -202,8 +206,7 @@ PRODUTOS = {
             {"tamanho": "G", "Q": 93, "A": 113, "L": 38.5},
             {"tamanho": "GG", "Q": 95, "A": 113, "L": 39.5},
             {"tamanho": "XG", "Q": 99, "A": 114, "L": 41},
-            {"tamanho": "2XG", "Q": 104, "A": 115, "L": 41}
-        ]
+        ],
     },
     11: {
         "id": 11,
@@ -220,8 +223,7 @@ PRODUTOS = {
             {"tamanho": "G", "Q": 91, "A": 111, "L": 37.5},
             {"tamanho": "GG", "Q": 94, "A": 112, "L": 38.5},
             {"tamanho": "XG", "Q": 98, "A": 113, "L": 40},
-            {"tamanho": "2XG", "Q": 102, "A": 114, "L": 41}
-        ]
+        ],
     },
     12: {
         "id": 12,
@@ -238,249 +240,546 @@ PRODUTOS = {
             {"tamanho": "G", "Q": 92, "A": 112, "L": 38},
             {"tamanho": "GG", "Q": 95, "A": 113, "L": 39},
             {"tamanho": "XG", "Q": 99, "A": 114, "L": 40.5},
-            {"tamanho": "2XG", "Q": 104, "A": 115, "L": 41}
-        ]
-    }
+        ],
+    },
+    13: {
+        "id": 13,
+        "nome": "calça jeans baggy hard",
+        "titulo": "Calça Jeans Baggy Hard",
+        "preco": 269.90,
+        "imagem": "imagens/calcas/calça jeans hard 2.jpeg",
+        "descricao": "Modelagem baggy com jeans encorpado de alta gramatura, caimento largo e lavagem especial.",
+        "tamanhos": ["38", "40", "42", "44", "46"],
+        "categoria": "Calças",
+        "medidas": [
+            {"tamanho": "38", "Q": 80, "A": 108, "L": 34},
+            {"tamanho": "40", "Q": 84, "A": 110, "L": 35},
+            {"tamanho": "42", "Q": 88, "A": 112, "L": 36},
+            {"tamanho": "44", "Q": 92, "A": 114, "L": 37},
+            {"tamanho": "46", "Q": 96, "A": 115, "L": 38},
+        ],
+    },
+    14: {
+        "id": 14,
+        "nome": "calça jeans baggy worn out",
+        "titulo": "Calça Jeans Baggy Worn Out",
+        "preco": 279.90,
+        "imagem": "imagens/calcas/calça jeans hard.jpeg",
+        "descricao": "Visual vintage desgastado com estampa streetwear marcante e corte bem amplo nas pernas.",
+        "tamanhos": ["38", "40", "42", "44", "46"],
+        "categoria": "Calças",
+        "medidas": [
+            {"tamanho": "38", "Q": 81, "A": 108, "L": 34.5},
+            {"tamanho": "40", "Q": 85, "A": 110, "L": 35.5},
+            {"tamanho": "42", "Q": 89, "A": 112, "L": 36.5},
+            {"tamanho": "44", "Q": 93, "A": 114, "L": 37.5},
+            {"tamanho": "46", "Q": 97, "A": 115, "L": 38.5},
+        ],
+    },
+    15: {
+        "id": 15,
+        "nome": "calça regular bless",
+        "titulo": "Calça Regular Bless",
+        "preco": 259.90,
+        "imagem": "imagens/calcas/calça regular bless.png",
+        "descricao": "Corte reto contemporâneo com apliques em alto relevo e costuras reforçadas.",
+        "tamanhos": ["38", "40", "42", "44", "46"],
+        "categoria": "Calças",
+        "medidas": [
+            {"tamanho": "38", "Q": 80, "A": 107, "L": 33},
+            {"tamanho": "40", "Q": 84, "A": 109, "L": 34},
+            {"tamanho": "42", "Q": 88, "A": 111, "L": 35},
+            {"tamanho": "44", "Q": 92, "A": 113, "L": 36},
+            {"tamanho": "46", "Q": 96, "A": 114, "L": 37},
+        ],
+    },
+    16: {
+        "id": 16,
+        "nome": "calça jeans sant",
+        "titulo": "Calça Jeans Sant",
+        "preco": 289.90,
+        "imagem": "imagens/calcas/calça jeans sant.png",
+        "descricao": "Estampa sacra oversized impressa em jeans escuro com caimento solto e caimento street.",
+        "tamanhos": ["38", "40", "42", "44", "46"],
+        "categoria": "Calças",
+        "medidas": [
+            {"tamanho": "38", "Q": 82, "A": 109, "L": 35},
+            {"tamanho": "40", "Q": 86, "A": 111, "L": 36},
+            {"tamanho": "42", "Q": 90, "A": 113, "L": 37},
+            {"tamanho": "44", "Q": 94, "A": 115, "L": 38},
+            {"tamanho": "46", "Q": 98, "A": 116, "L": 39},
+        ],
+    },
+    17: {
+        "id": 17,
+        "nome": "calça jeans barrel",
+        "titulo": "Calça Jeans Barrel",
+        "preco": 249.90,
+        "imagem": "imagens/calcas/calça jeans barrel.png",
+        "descricao": "Modelagem Barrel curvada nas pernas com tom jeans escuro e costura contrastante amarela.",
+        "tamanhos": ["38", "40", "42", "44", "46"],
+        "categoria": "Calças",
+        "medidas": [
+            {"tamanho": "38", "Q": 79, "A": 106, "L": 34},
+            {"tamanho": "40", "Q": 83, "A": 108, "L": 35},
+            {"tamanho": "42", "Q": 87, "A": 110, "L": 36},
+            {"tamanho": "44", "Q": 91, "A": 112, "L": 37},
+            {"tamanho": "46", "Q": 95, "A": 113, "L": 38},
+        ],
+    },
+    18: {
+        "id": 18,
+        "nome": "calça baggy nation",
+        "titulo": "Calça Baggy Nation",
+        "preco": 299.90,
+        "imagem": "imagens/calcas/calça baggy nation.png",
+        "descricao": "Corte oversized com tipografia Nation e elementos gravados ao longo da perna esquerda.",
+        "tamanhos": ["38", "40", "42", "44", "46"],
+        "categoria": "Calças",
+        "medidas": [
+            {"tamanho": "38", "Q": 82, "A": 110, "L": 35.5},
+            {"tamanho": "40", "Q": 86, "A": 112, "L": 36.5},
+            {"tamanho": "42", "Q": 90, "A": 114, "L": 37.5},
+            {"tamanho": "44", "Q": 94, "A": 115, "L": 38.5},
+            {"tamanho": "46", "Q": 98, "A": 116, "L": 39.5},
+        ],
+    },
+    19: {
+        "id": 19,
+        "nome": "calça jeans baggy camuflada",
+        "titulo": "Calça Jeans Baggy Camuflada",
+        "preco": 269.90,
+        "imagem": "imagens/calcas/calça baggy camuflada.png",
+        "descricao": "Estampa camuflada militar em sarja encorpada com modelagem bem larga nas pernas.",
+        "tamanhos": ["38", "40", "42", "44", "46"],
+        "categoria": "Calças",
+        "medidas": [
+            {"tamanho": "38", "Q": 81, "A": 108, "L": 35},
+            {"tamanho": "40", "Q": 85, "A": 110, "L": 36},
+            {"tamanho": "42", "Q": 89, "A": 112, "L": 37},
+            {"tamanho": "44", "Q": 93, "A": 114, "L": 38},
+            {"tamanho": "46", "Q": 97, "A": 115, "L": 39},
+        ],
+    },
+    20: {
+        "id": 20,
+        "nome": "gorro oncinha y2k",
+        "titulo": "Gorro Oncinha Y2K",
+        "preco": 79.90,
+        "imagem": "imagens/gorros/gorro oncinha y2k.png",
+        "descricao": "Gorro em tricô macio com estampa animal print e modelagem anatômica urbana.",
+        "tamanhos": ["Único"],
+        "categoria": "Acessórios",
+        "medidas": [
+            {"tamanho": "Único", "Q": 54, "A": 22, "L": 20},
+        ],
+    },
+    21: {
+        "id": 21,
+        "nome": "gorro pré cort",
+        "titulo": "Gorro Pré Cort",
+        "preco": 89.90,
+        "imagem": "imagens/gorros/gorro pré cort.png",
+        "descricao": "Gorro em malha encorpada preta com bordado frontal amplo em relevo.",
+        "tamanhos": ["Único"],
+        "categoria": "Acessórios",
+        "medidas": [
+            {"tamanho": "Único", "Q": 54, "A": 22, "L": 20},
+        ],
+    },
+    22: {
+        "id": 22,
+        "nome": "gorro y2k black",
+        "titulo": "Gorro Y2K Black",
+        "preco": 79.90,
+        "imagem": "imagens/gorros/gorro y2k black.png",
+        "descricao": "Gorro preto minimalista estilo Y2K com bordado metálico prateado.",
+        "tamanhos": ["Único"],
+        "categoria": "Acessórios",
+        "medidas": [
+            {"tamanho": "Único", "Q": 54, "A": 22, "L": 20},
+        ],
+    },
+    23: {
+        "id": 23,
+        "nome": "gorro y2k white",
+        "titulo": "Gorro Y2K White",
+        "preco": 79.90,
+        "imagem": "imagens/gorros/gorro y2k white.png",
+        "descricao": "Edição branca em lã macia com estampa frontal estilo graffitero urbano.",
+        "tamanhos": ["Único"],
+        "categoria": "Acessórios",
+        "medidas": [
+            {"tamanho": "Único", "Q": 54, "A": 22, "L": 20},
+        ],
+    },
+    24: {
+        "id": 24,
+        "nome": "gorro white red",
+        "titulo": "Gorro White Red",
+        "preco": 84.90,
+        "imagem": "imagens/gorros/gorro white red.jpg",
+        "descricao": "Gorro com estampa em contraste vermelho e branco e tecido térmico de alta durabilidade.",
+        "tamanhos": ["Único"],
+        "categoria": "Acessórios",
+        "medidas": [
+            {"tamanho": "Único", "Q": 54, "A": 22, "L": 20},
+        ],
+    },
 }
 
-# Rota para o produto
+# Filtra medidas apenas para os tamanhos disponíveis no produto
+for _p in PRODUTOS.values():
+    _p["medidas"] = [m for m in _p["medidas"] if m["tamanho"] in _p["tamanhos"]]
+
+
+# ----------------------------------------------------------------------------
+# AUXILIARES
+# ----------------------------------------------------------------------------
+def login_obrigatorio(func):
+    """Redireciona para o login se o usuário não estiver logado."""
+    @wraps(func)
+    def wrapper(*args, **kwargs):
+        if "usuario_id" not in session:
+            return redirect(url_for("login"))
+        return func(*args, **kwargs)
+    return wrapper
+
+
+def iniciar_sessao(usuario):
+    session["usuario_id"] = usuario["id"]
+    session["usuario_nome"] = usuario["nome"]
+    session["usuario_email"] = usuario["email"]
+
+
+# ----------------------------------------------------------------------------
+# PÁGINAS
+# ----------------------------------------------------------------------------
+@app.route("/")
+def index():
+    return render_template("index.html")
+
+
+@app.route("/inicio")
+def inicio():
+    return render_template("inicio.html")
+
 
 @app.route("/produto/<int:produto_id>")
 def produto(produto_id):
-
     produto_selecionado = PRODUTOS.get(produto_id)
 
     if produto_selecionado is None:
         return "Produto não encontrado", 404
 
-    return render_template(
-        "produto.html",
-        produto=produto_selecionado
-    )
+    return render_template("produto.html", produto=produto_selecionado)
 
+
+# ----------------------------------------------------------------------------
 # CADASTRO
-
+# ----------------------------------------------------------------------------
 @app.route("/registro", methods=["GET", "POST"])
 def registro():
-
     if request.method == "POST":
-
         nome = request.form.get("nome", "").strip()
         email = request.form.get("email", "").strip().lower()
         telefone = request.form.get("telefone", "").strip()
+        cep = re.sub(r"\D", "", request.form.get("cep", ""))
         senha = request.form.get("senha", "")
+        confirmar_senha = request.form.get("confirmarSenha", "")
 
         erros = []
 
-        # Nome
-        if not re.fullmatch(
-            r"[A-Za-zÀ-ÿ\s]{3,100}",
-            nome
-        ):
-            erros.append(
-                "Nome inválido. Use apenas letras e espaços."
-            )
+        if not re.fullmatch(NOME_REGEX, nome):
+            erros.append("Nome inválido. Use apenas letras e espaços (mínimo 3).")
 
-        # E-mail
-        if not re.fullmatch(
-            r"^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$",
-            email
-        ):
+        if not re.fullmatch(EMAIL_REGEX, email):
             erros.append("E-mail inválido.")
 
-        # Telefone
-        if not re.fullmatch(
-            r"\([0-9]{2}\)\s?[0-9]{5}-[0-9]{4}",
-            telefone
-        ):
-            erros.append(
-                "Telefone inválido. Use o formato (11) 96666-7777."
-            )
+        telefone_numeros = re.sub(r"\D", "", telefone)
+        if len(telefone_numeros) < 10 or len(telefone_numeros) > 11:
+            erros.append("Telefone inválido. Deve ter 10 ou 11 dígitos.")
 
-        # Senha
-        if not re.fullmatch(
-            r"(?=.*[A-Za-z])(?=.*[0-9]).{8,72}",
-            senha
-        ):
-            erros.append(
-                "A senha deve ter entre 8 e 72 caracteres "
-                "e conter letras e números."
-            )
+        if len(cep) != 8:
+            erros.append("CEP inválido. Deve ter 8 números.")
+
+        if len(senha) < 6:
+            erros.append("A senha deve ter no mínimo 6 caracteres.")
+
+        if senha != confirmar_senha:
+            erros.append("As senhas não coincidem.")
 
         if erros:
-            return render_template(
-                "registro.html",
-                erros=erros
-            )
+            return render_template("registro.html", erros=erros)
 
-        senha_hash = generate_password_hash(senha)
+        senha_hash = generate_password_hash(senha, method="pbkdf2:sha256")
 
-        conexao = conectar_mysql()
-        cursor = conexao.cursor()
-
+        conexao = None
+        cursor = None
         try:
-
-            sql = """
-                INSERT INTO usuarios
-                (nome, email, telefone, senha)
-                VALUES (%s, %s, %s, %s)
-            """
+            conexao = conectar_mysql()
+            cursor = conexao.cursor(dictionary=True)
 
             cursor.execute(
-                sql,
-                (nome, email, telefone, senha_hash)
+                """
+                INSERT INTO usuarios (nome, email, telefone, senha)
+                VALUES (%s, %s, %s, %s)
+                """,
+                (nome, email, telefone_numeros, senha_hash),
             )
-
             conexao.commit()
 
         except mysql.connector.IntegrityError:
-
-            conexao.rollback()
-
+            if conexao:
+                conexao.rollback()
+            return render_template("registro.html", erros=["Este e-mail já está cadastrado."])
+        except mysql.connector.Error:
+            log.exception("Erro ao cadastrar usuário")
+            if conexao:
+                conexao.rollback()
             return render_template(
                 "registro.html",
-                erros=["Este e-mail já está cadastrado."]
+                erros=["Não foi possível concluir o cadastro. Tente novamente."],
             )
-
         finally:
-
-            cursor.close()
-            conexao.close()
+            if cursor:
+                cursor.close()
+            if conexao:
+                conexao.close()
 
         return redirect(url_for("login"))
 
     return render_template("registro.html")
 
-# LOGIN
 
+# ----------------------------------------------------------------------------
+# LOGIN / LOGOUT
+# ----------------------------------------------------------------------------
 @app.route("/login", methods=["GET", "POST"])
 def login():
-
     if request.method == "POST":
-
         email = request.form.get("email", "").strip().lower()
         senha = request.form.get("senha", "")
 
         erros = []
 
-        # Validar email
-        if not re.fullmatch(
-            r"^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$",
-            email
-        ):
+        if not re.fullmatch(EMAIL_REGEX, email):
             erros.append("E-mail inválido.")
 
-        # Validar senha
-        if not senha or len(senha) < 1:
+        if not senha:
             erros.append("Senha obrigatória.")
 
         if erros:
+            return render_template("login.html", erros=erros)
+
+        conexao = None
+        cursor = None
+        try:
+            conexao = conectar_mysql()
+            cursor = conexao.cursor(dictionary=True)
+            cursor.execute(
+                "SELECT id, nome, email, senha FROM usuarios WHERE email = %s",
+                (email,),
+            )
+            usuario = cursor.fetchone()
+        except mysql.connector.Error:
+            log.exception("Erro no login")
             return render_template(
                 "login.html",
-                erros=erros
+                erros=["Erro ao acessar o sistema. Tente novamente."],
             )
-
-        conexao = conectar_mysql()
-        cursor = conexao.cursor(dictionary=True)
-
-        try:
-
-            sql = "SELECT id, nome, email, senha FROM usuarios WHERE email = %s"
-            cursor.execute(sql, (email,))
-            usuario = cursor.fetchone()
-
-            if usuario and check_password_hash(usuario["senha"], senha):
-                session["usuario_id"] = usuario["id"]
-                session["usuario_nome"] = usuario["nome"]
-                session["usuario_email"] = usuario["email"]
-                return redirect(url_for("index"))
-            else:
-                erros = ["E-mail ou senha incorretos."]
-                return render_template(
-                    "login.html",
-                    erros=erros
-                )
-
         finally:
+            if cursor:
+                cursor.close()
+            if conexao:
+                conexao.close()
 
-            cursor.close()
-            conexao.close()
+        senha_ok = False
+        if usuario:
+            try:
+                senha_ok = check_password_hash(usuario["senha"], senha)
+            except Exception:
+                log.exception("Hash de senha inválido para %s", email)
+
+        if senha_ok:
+            iniciar_sessao(usuario)
+            return redirect(url_for("index"))
+
+        if usuario is None:
+            log.info("Login falhou: e-mail %s não existe no banco", email)
+        else:
+            log.info("Login falhou: senha incorreta para %s", email)
+
+        return render_template("login.html", erros=["E-mail ou senha incorretos."])
 
     return render_template("login.html")
 
-# LOGOUT
 
 @app.route("/logout")
 def logout():
     session.clear()
     return redirect(url_for("index"))
 
+
+# ----------------------------------------------------------------------------
+# CARRINHO
+# ----------------------------------------------------------------------------
 @app.route("/carrinho/adicionar", methods=["POST"])
+@login_obrigatorio
 def adicionar_carrinho():
+    produto_id = request.form.get("produto_id", type=int)
+    tamanho = request.form.get("tamanho", "")
 
-    produto_id = request.form.get("produto_id")
-    tamanho = request.form.get("tamanho")
-    quantidade = request.form.get("quantidade")
+    if produto_id is None or produto_id not in PRODUTOS:
+        return "Produto inválido", 400
 
-    if not produto_id:
-        return "Produto não informado", 400
-
-    if tamanho not in ["P", "M", "G", "GG", "XG", "2XG"]:
+    if tamanho not in PRODUTOS[produto_id]["tamanhos"]:
         return "Tamanho inválido", 400
 
-    try:
-
-        quantidade = int(quantidade)
-
-        if quantidade < 1 or quantidade > 10:
-            return "Quantidade inválida", 400
-
-    except (TypeError, ValueError):
-
+    quantidade = request.form.get("quantidade", type=int)
+    if quantidade is None or quantidade < 1 or quantidade > 10:
         return "Quantidade inválida", 400
 
-    conexao = conectar_mysql()
-    cursor = conexao.cursor()
-
+    conexao = None
+    cursor = None
     try:
-
-        sql = """
-            INSERT INTO carrinho
-            (produto_id, tamanho, quantidade)
-            VALUES (%s, %s, %s)
-        """
+        conexao = conectar_mysql()
+        cursor = conexao.cursor()
 
         cursor.execute(
-            sql,
-            (produto_id, tamanho, quantidade)
+            """
+            INSERT INTO carrinho (id_usuario, id_produto, tamanho, quantidade)
+            VALUES (%s, %s, %s, %s)
+            ON DUPLICATE KEY UPDATE quantidade = LEAST(quantidade + %s, 10)
+            """,
+            (session["usuario_id"], produto_id, tamanho, quantidade, quantidade),
         )
-
         conexao.commit()
-
+    except mysql.connector.Error:
+        log.exception("Erro ao adicionar ao carrinho")
+        if conexao:
+            conexao.rollback()
+        return "Não foi possível adicionar ao carrinho.", 500
     finally:
-
-        cursor.close()
-        conexao.close()
+        if cursor:
+            cursor.close()
+        if conexao:
+            conexao.close()
 
     return redirect(url_for("carrinho"))
 
 
-#carrinho
-
 @app.route("/carrinho")
+@login_obrigatorio
 def carrinho():
+    conexao = None
+    cursor = None
+    linhas = []
+    try:
+        conexao = conectar_mysql()
+        cursor = conexao.cursor(dictionary=True)
+        cursor.execute(
+            """
+            SELECT id_carrinho, id_produto, tamanho, quantidade
+            FROM carrinho
+            WHERE id_usuario = %s
+            ORDER BY criado_em DESC
+            """,
+            (session["usuario_id"],),
+        )
+        linhas = cursor.fetchall()
+    except mysql.connector.Error:
+        log.exception("Erro ao carregar carrinho")
+    finally:
+        if cursor:
+            cursor.close()
+        if conexao:
+            conexao.close()
 
-    return render_template("carrinho.html")
+    itens = []
+    total = 0.0
+    for linha in linhas:
+        p = PRODUTOS.get(linha["id_produto"])
+        if p is None:
+            continue
+        subtotal = p["preco"] * linha["quantidade"]
+        total += subtotal
+        itens.append(
+            {
+                "id_carrinho": linha["id_carrinho"],
+                "produto": p,
+                "tamanho": linha["tamanho"],
+                "quantidade": linha["quantidade"],
+                "subtotal": subtotal,
+            }
+        )
 
-#executar tudo isso
-#conectar MYSQL 
-def conectar_mysql():
-    return mysql.connector.connect(
-        host="localhost",
-        user="root",
-        password="senai105",
-        database="DADOS_ROYAL_DRIP"
-    )
+    return render_template("carrinho.html", itens=itens, total=total)
 
+
+@app.route("/carrinho/remover/<int:id_carrinho>", methods=["POST"])
+@login_obrigatorio
+def remover_carrinho(id_carrinho):
+    conexao = None
+    cursor = None
+    try:
+        conexao = conectar_mysql()
+        cursor = conexao.cursor()
+        cursor.execute(
+            "DELETE FROM carrinho WHERE id_carrinho = %s AND id_usuario = %s",
+            (id_carrinho, session["usuario_id"]),
+        )
+        conexao.commit()
+    except mysql.connector.Error:
+        log.exception("Erro ao remover item do carrinho")
+        if conexao:
+            conexao.rollback()
+    finally:
+        if cursor:
+            cursor.close()
+        if conexao:
+            conexao.close()
+
+    return redirect(url_for("carrinho"))
+
+
+# ----------------------------------------------------------------------------
+# PEDIDOS DOS CLIENTES
+# ----------------------------------------------------------------------------
+@app.route("/pedidos")
+def listar_pedidos():
+    pedidos = []
+    erro = None
+    conexao = None
+    cursor = None
+    try:
+        conexao = conectar_mysql()
+        cursor = conexao.cursor(dictionary=True)
+        cursor.execute(
+            """
+            SELECT p.id_pedido, c.nome, c.cidade, c.estado,
+                   p.data_pedido, p.valor_total, p.status_pedido
+            FROM pedidos p
+            INNER JOIN clientes c ON c.id_cliente = p.id_cliente
+            ORDER BY p.data_pedido DESC
+            """
+        )
+        pedidos = cursor.fetchall()
+    except mysql.connector.Error:
+        log.exception("Erro ao listar pedidos")
+        erro = "Não foi possível carregar os pedidos. Tente novamente."
+    finally:
+        if cursor:
+            cursor.close()
+        if conexao:
+            conexao.close()
+
+    return render_template("pedidos.html", pedidos=pedidos, erro=erro)
+
+
+
+# ----------------------------------------------------------------------------
+# EXECUTAR
+# ----------------------------------------------------------------------------
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run(debug=os.environ.get("FLASK_DEBUG", "1") == "1")
