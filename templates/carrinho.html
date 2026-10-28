@@ -2,87 +2,85 @@
 <html lang="pt-BR">
   <head>
     <meta charset="UTF-8" />
-    <title>Loja de Roupas</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}" />
+    <title>Meu Carrinho - Royal Drip</title>
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='style.css') }}"
+    />
   </head>
   <body>
-    <h1>Loja de Roupas</h1>
+    <main style="padding: 20px">
+      <a
+        href="{{ url_for('index') }}#produtos"
+        style="
+          display: inline-block;
+          margin-bottom: 16px;
+          color: #001f54;
+          font-weight: 600;
+          text-decoration: none;
+        "
+      >
+      <h1>Meu Carrinho</h1>
+      {% if itens %}
+      <div class="carrinho-lista">
+        {% for item in itens %}
+        <div
+          class="carrinho-item"
+          style="
+            display: flex;
+            gap: 20px;
+            align-items: center;
+            margin-bottom: 15px;
+          "
+        >
+          <img
+            src="{{ url_for('static', filename=item.produto.imagem) }}"
+            alt="{{ item.produto.titulo }}"
+            width="80"
+          />
+          <div>
+            <h3>{{ item.produto.titulo }}</h3>
+            <p>Tamanho: {{ item.tamanho }} | Qtd: {{ item.quantidade }}</p>
+            <p>Preço unitário: R$ {{ "%.2f"|format(item.produto.preco) }}</p>
+            <p>
+              <strong>Subtotal: R$ {{ "%.2f"|format(item.subtotal) }}</strong>
+            </p>
+          </div>
+          <form
+            action="{{ url_for('remover_carrinho', id_carrinho=item.id_carrinho) }}"
+            method="POST"
+          >
+            <button type="submit">Remover</button>
+          </form>
+        </div>
+        {% endfor %}
+      </div>
 
-    <h2>Produtos</h2>
+      <hr />
+      <h2>Total: R$ {{ "%.2f"|format(total) }}</h2>
+      <a
+        href="{{ url_for('index') }}#produtos"
+        style="
+          display: inline-block;
+          margin-right: 12px;
+          color: #001f54;
+          font-weight: 600;
+        "
+        >+ Adicionar mais produtos</a
+      >
+      <button
+        type="button"
+        disabled
+        title="Finalização de compra ainda não implementada"
+      >
 
-    <p>Camiseta</p>
-    Quantidade:
-    <input type="number" id="qtdCamiseta" min="1" value="1" />
-    <button onclick="adicionar('Camiseta', 'qtdCamiseta')">
-      Adicionar ao Carrinho
-    </button>
-
-    <br /><br />
-
-    <p>Blusa de Moletom</p>
-    Quantidade:
-    <input type="number" id="qtdBlusa" min="1" value="1" />
-    <button onclick="adicionar('Blusa de Moletom', 'qtdBlusa')">
-      Adicionar ao Carrinho
-    </button>
-
-    <br /><br />
-
-    <p>Moletom</p>
-    Quantidade:
-    <input type="number" id="qtdMoletom" min="1" value="1" />
-    <button onclick="adicionar('Moletom', 'qtdMoletom')">
-      Adicionar ao Carrinho
-    </button>
-
-    <br /><br />
-
-    <p>Jaqueta</p>
-    Quantidade:
-    <input type="number" id="qtdJaqueta" min="1" value="1" />
-    <button onclick="adicionar('Jaqueta', 'qtdJaqueta')">
-      Adicionar ao Carrinho
-    </button>
-
-    <hr />
-
-    <h2>Meu Carrinho</h2>
-
-    <ul id="carrinho"></ul>
-
-    <button onclick="limparCarrinho()">Limpar Carrinho</button>
-    <button onclick="enviarPedido()">Finalizar Compra</button>
-
-    <p id="mensagem"></p>
-
-    <script>
-      function adicionar(produto, idQuantidade) {
-        let quantidade = document.getElementById(idQuantidade).value;
-
-        let lista = document.getElementById("carrinho");
-        let item = document.createElement("li");
-
-        item.textContent = produto + " - Quantidade: " + quantidade;
-
-        lista.appendChild(item);
-      }
-
-      function limparCarrinho() {
-        document.getElementById("carrinho").innerHTML = "";
-        document.getElementById("mensagem").innerHTML = "";
-      }
-
-      function enviarPedido() {
-        let itens = document.getElementById("carrinho").children;
-
-        if (itens.length === 0) {
-          document.getElementById("mensagem").innerHTML =
-            "❌ Adicione produtos ao carrinho antes de finalizar a compra.";
-        } else {
-          document.getElementById("mensagem").innerHTML =
-            "✅ Compra enviada com sucesso!";
-        }
-      }
-    </script>
+        Finalizar Compra
+      </button>
+      {% else %}
+      <p>Seu carrinho está vazio.</p>
+      <a href="{{ url_for('index') }}">Voltar para os produtos</a>
+      {% endif %}
+      
+    </main>
   </body>
 </html>

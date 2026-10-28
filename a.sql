@@ -132,24 +132,63 @@ ON DUPLICATE KEY UPDATE
     senha = VALUES(senha);   -- redefine a senha dos usuários de teste
 
 -- Produtos: mesmos ids, nomes e preços do dicionário PRODUTOS do app.py
+-- Royal Drip: sincroniza produtos com o dicionário PRODUTOS do app.py
+-- Antes de executar, confirme que id_categoria 1..5 correspondem às categorias indicadas.
+-- Produtos existentes são atualizados; estoque existente é preservado; novos produtos começam com estoque 0.
+START TRANSACTION;
 INSERT INTO produtos (id_produto, id_categoria, nome_produto, descricao, preco, estoque, imagem_url) VALUES
-(1,  1, 'Camisa Boxy Dark Angel Drop 01',  'Modelagem ampla com corte streetwear moderno, algodão encorpado e acabamento premium.', 129.90, 45, 'imagens/camisas/camisa 1.jpg'),
-(2,  1, 'Camisa Boxy Black Bite Drop 02',  'Corte oversized com visual urbano, estampa marcante e tecido confortável.',             139.90, 40, 'imagens/camisas/camisa 2.jpg'),
-(3,  1, 'Camisa Boxy Light Bite Drop 03',  'Edição leve com visual clean, caimento amplo e acabamento premium.',                    149.90, 35, 'imagens/camisas/camisa 3.jpg'),
-(4,  2, 'Conjunto Cinza Street Drop 01',   'Moletom pesado com capuz e calça cargo, ideal para clima frio.',                        289.90, 20, 'imagens/blusas_Conjuntos/conjunto moletom cinza.jpg'),
-(5,  2, 'Conjunto UK Drop 02',             'Visual urbano com textura premium para um outfit monotonal.',                           299.90, 20, 'imagens/blusas_Conjuntos/USA.jpg'),
-(6,  2, 'Conjunto Branco Street Drop 03',  'Estilo minimalista com acabamento refinado e tecido macio.',                            319.90, 18, 'imagens/blusas_Conjuntos/conjunto branco copy.jpg'),
-(7,  2, 'Conjunto Blue Street Drop 04',    'Conjunto azul com visual esportivo e premium.',                                         329.90, 15, 'imagens/blusas_Conjuntos/conj2.jpg'),
-(8,  2, 'Conjunto Camuflado Street Drop 05','Estampa camuflada com visual robusto e capuz reforçado.',                              339.90, 15, 'imagens/blusas_Conjuntos/conj3.jpg'),
-(9,  2, 'Conjunto Cimento Street Drop 06', 'Tom cimento com acabamento refinado e caimento largo.',                                 349.90, 12, 'imagens/blusas_Conjuntos/conj4.jpg'),
-(10, 3, 'Calça de Moletom Letringg Drop 07','Calça de moletom com conforto premium e modelagem moderna.',                           239.90, 25, 'imagens/calcas/Calça Moletom.jpg'),
-(11, 3, 'Calça de Moletom Branca Drop 08', 'Visual clean e contemporâneo, com ajuste que favorece a modelagem ampla.',              247.90, 22, 'imagens/calcas/calça branca.jpg'),
-(12, 3, 'Calça de Moletom Azul Drop 09',   'Visual esportivo, acabamento versátil e toque macio.',                                  249.90, 22, 'imagens/calcas/calça azul.jpg')
+(1, 1, 'Camisa Boxy Dark Angel Drop 01', 'Modelagem ampla com corte streetwear moderno, algodão encorpado e acabamento premium.', 129.90, 0, 'imagens/camisas/camisa 1.webp'),
+(2, 1, 'Camisa Boxy Black Bite Drop 02', 'Corte oversized com visual urbano, estampa marcante e tecido confortável.', 139.90, 0, 'imagens/camisas/camisa 2.webp'),
+(3, 1, 'Camisa Boxy Light Bite Drop 03', 'Edição leve com visual clean, caimento amplo e acabamento premium.', 149.90, 0, 'imagens/camisas/camisa 3.webp'),
+(4, 1, 'Camisa Boxy Brasilian Once', 'Camisa Boxy Brasilian Once com estampa exclusiva e caimento oversized.', 139.90, 0, 'imagens/camisas/camisa boxy brasilian once.webp'),
+(5, 1, 'Camisa Boxy Come In', 'Camisa Boxy Come In com estampa urbana e tecido encorpado.', 139.90, 0, 'imagens/camisas/camisa boxy come in.webp'),
+(6, 1, 'Camisa Boxy Good Plan', 'Camisa Boxy Good Plan com caimento streetwear amplo.', 139.90, 0, 'imagens/camisas/camisa boxy good plan.webp'),
+(7, 2, 'Conjunto Cinza Street Drop 01', 'Moletom pesado com capuz e calça em modelo confortável.', 289.90, 0, 'imagens/blusas_Conjuntos/conjunto moletom cinza.webp'),
+(8, 2, 'Conjunto UK Drop 02', 'Visual urbano e com textura premium.', 299.90, 0, 'imagens/blusas_Conjuntos/USA.webp'),
+(9, 2, 'Conjunto Branco Street Drop 03', 'Estilo minimalista com acabamento refinado e tecido macio.', 319.90, 0, 'imagens/blusas_Conjuntos/conjunto branco copy.webp'),
+(10, 2, 'Conjunto Blue Street Drop 04', 'Conjunto em tom azul com visual esportivo e premium.', 329.90, 0, 'imagens/blusas_Conjuntos/conj2.webp'),
+(11, 2, 'Conjunto Camuflado Street Drop 05', 'Estampa camuflada com visual robusto e capuz reforçado.', 339.90, 0, 'imagens/blusas_Conjuntos/conj3.webp'),
+(12, 2, 'Conjunto Cimento Street Drop 06', 'Tom cimento com acabamento refinado e caimento largo.', 349.90, 0, 'imagens/blusas_Conjuntos/conj4.webp'),
+(13, 3, 'Calça de Moletom Letringg Drop 07', 'Calça de moletom com conforto premium e ajuste elástico.', 239.90, 0, 'imagens/calcas/Calça Moletom.webp'),
+(14, 3, 'Calça de Moletom Branca Drop 08', 'Visual clean e contemporâneo com tecido confortável.', 247.90, 0, 'imagens/calcas/calça branca.webp'),
+(15, 3, 'Calça de Moletom Azul Drop 09', 'Corte esportivo versátil e toque macio.', 249.90, 0, 'imagens/calcas/calça azul.webp'),
+(16, 3, 'Calça Jeans Baggy Hard', 'Modelagem baggy com jeans encorpado de alta gramatura.', 269.90, 0, 'imagens/calcas/calça jeans hard 2.webp'),
+(17, 3, 'Calça Jeans Baggy Worn Out', 'Visual vintage desgastado com estampa streetwear marcante.', 279.90, 0, 'imagens/calcas/calça jeans hard.webp'),
+(18, 3, 'Calça Regular Bless', 'Corte reto contemporâneo com apliques em alto relevo.', 259.90, 0, 'imagens/calcas/calça regular bless.webp'),
+(19, 3, 'Calça Jeans Sant', 'Estampa sacra oversized impressa em jeans escuro.', 289.90, 0, 'imagens/calcas/calça jeans sant.webp'),
+(20, 3, 'Calça Jeans Barrel', 'Modelagem Barrel curvada nas pernas com tom jeans escuro.', 249.90, 0, 'imagens/calcas/calça jeans barrel.webp'),
+(21, 3, 'Calça Baggy Nation', 'Corte oversized com tipografia Nation gravada ao longo da perna.', 299.90, 0, 'imagens/calcas/calça baggy nation.webp'),
+(22, 3, 'Calça Jeans Baggy Camuflada', 'Estampa camuflada militar em sarja encorpada com modelagem bem larga.', 269.90, 0, 'imagens/calcas/calça baggy camuflada.webp'),
+(23, 4, 'Gorro Oncinha Y2K', 'Gorro em tricô macio com estampa animal print Y2K.', 79.90, 0, 'imagens/gorros/gorro oncinha y2k.webp'),
+(24, 4, 'Gorro Pré Cort', 'Gorro em malha encorpada preta com bordado frontal amplo.', 89.90, 0, 'imagens/gorros/gorro pré cort.webp'),
+(25, 4, 'Gorro Y2K Black', 'Gorro preto minimalista estilo Y2K.', 79.90, 0, 'imagens/gorros/gorro y2k black.webp'),
+(26, 4, 'Gorro Y2K White', 'Edição branca em lã macia com estampa frontal estilo graffiti.', 79.90, 0, 'imagens/gorros/gorro y2k white.webp'),
+(27, 4, 'Gorro White Red', 'Gorro com estampa em contraste vermelho e branco.', 84.90, 0, 'imagens/gorros/gorro white red.webp'),
+(28, 5, 'Cinto Blue Star', 'Cinto cravejado com pedras azuis e fivela prateada em formato de estrela Y2K.', 119.90, 0, 'imagens/cintos/blue star.webp'),
+(29, 5, 'Cinto Cravejado de Caveira', 'Cinto preto em couro sintético premium com pedras brilhantes e fivela de caveira pirata.', 129.90, 0, 'imagens/cintos/cinto caveira.webp'),
+(30, 5, 'Cinto Fly Heart', 'Cinto em estilo punk/streetwear com fivela em formato de coração alado metálico.', 119.90, 0, 'imagens/cintos/fly heart.webp'),
+(31, 5, 'Cinto Purple Cup', 'Cinto roxo cravejado com fivela personalizada em liga metálica de alta resistência.', 124.90, 0, 'imagens/cintos/purple cup.webp'),
+(32, 5, 'Red Die', 'Cinto vermelho streetwear com detalhes metálicos e fivela marcante.', 119.90, 0, 'imagens/cintos/red die.webp'),
+(33, 5, 'Stelar White', 'Cinto branco com fivelas e tachas metálicas em formato de estrela.', 119.90, 0, 'imagens/cintos/stelar white.webp'),
+(34, 5, 'Cinto Camuflado', 'Cinto camuflado com a fivela personalizada com escritas douradas.', 119.90, 0, 'imagens/cintos/cinto camuflado.webp'),
+(35, 5, 'Cinto Swag Branco', 'Cinto branco com fivelas e tachas metálicas em formato de ST.', 119.90, 0, 'imagens/cintos/cinto swag branco.webp'),
+(36, 5, 'Cinto Swag Preto', 'Cinto preto com fivelas e tachas metálicas em formato de ST.', 119.90, 0, 'imagens/cintos/cinto swag preto.webp'),
+(37, 5, 'Cinto Lunar BL', 'Cinto preto com fivelas e tachas metálicas em formato de lua.', 119.90, 0, 'imagens/cintos/cinto lunar bl.webp'),
+(38, 5, 'Cinto Marrom Star', 'Cinto marrom com fivelas e tachas metálicas em formato de estrela.', 119.90, 0, 'imagens/cintos/cinto marrom star.webp'),
+(39, 5, 'Cinto Couro Cowboy', 'Cinto de couro cowboy com fivelas e tachas metálicas.', 119.90, 0, 'imagens/cintos/cinto couro cawboy.webp')
 ON DUPLICATE KEY UPDATE
-    nome_produto = VALUES(nome_produto),
-    descricao    = VALUES(descricao),
-    preco        = VALUES(preco),
-    imagem_url   = VALUES(imagem_url);
+  id_categoria = VALUES(id_categoria),
+  nome_produto = VALUES(nome_produto),
+  descricao = VALUES(descricao),
+  preco = VALUES(preco),
+  imagem_url = VALUES(imagem_url);
+COMMIT;
+
+-- Verificação: deve retornar os IDs de 1 a 39.
+SELECT id_produto, id_categoria, nome_produto, preco, estoque, imagem_url
+FROM produtos
+WHERE id_produto BETWEEN 1 AND 39
+ORDER BY id_produto;
 
 -- Pedidos (valor_total = soma dos itens abaixo)
 INSERT IGNORE INTO pedidos (id_pedido, id_usuario, data_pedido, valor_total, status_pedido) VALUES
@@ -343,3 +382,92 @@ WHERE p.id_pedido IS NULL;
 -- - Qual consulta usar: A consulta 4 (LEFT JOIN com IS NULL), pois isola perfeitamente 
 --   os clientes sem histórico de compras para ações direcionadas.
 -- =====================================================================
+
+SHOW TABLES;
+
+DESCRIBE pedidos;
+
+SHOW DATABASES;
+
+USE royal_drip_sql;
+
+SHOW TABLES;
+
+SELECT DATABASE
+USE royal_drip_sql;
+
+CREATE TABLE IF NOT EXISTS pedidos (
+    id_pedido INT AUTO_INCREMENT PRIMARY KEY,
+    cliente VARCHAR(100),
+    produto VARCHAR(100),
+    data_pedido DATE
+);
+
+-- 1. Calcular quantos dias se passaram desde cada pedido
+INSERT INTO pedidos (cliente, produto, data_pedido)
+VALUES
+('Ana', 'Camiseta', '2026-10-20'),
+('Lucas', 'Calça de moletom', '2026-10-22'),
+('Mariana', 'Conjunto de moletom', '2026-10-25');
+
+SELECT 
+    id_pedido,
+    cliente,
+    produto,
+    data_pedido,
+    DATEDIFF(CURDATE(), data_pedido) AS dias_desde_pedido
+FROM pedidos;
+
+-- 2. Mostrar a data do pedido no formato brasileiro
+SELECT
+    id_pedido,
+    cliente,
+    DATE_FORMAT(data_pedido, '%d/%m/%Y') AS data_formatada
+FROM pedidos;
+
+-- 3. Mostrar a data atual
+SELECT CURDATE() AS data_atual;
+
+USE royal_drip_sql;
+
+SELECT
+    id_pedido,
+    cliente,
+    produto,
+    data_pedido,
+    CASE
+        WHEN data_pedido IS NULL THEN 'Data não preenchida'
+        WHEN data_pedido > CURDATE() THEN 'Verificar data futura'
+    END AS problema_encontrado
+FROM pedidos
+WHERE data_pedido IS NULL
+   OR data_pedido > CURDATE();
+
+SELECT 
+	id AS id_usuario,
+    
+    -- 1. TRIM + UPPER: Remove espaços extras e deixa o nome em maiúsculas para relatórios
+    UPPER(TRIM(nome)) AS nome_padronizado,
+    
+    -- 2. TRIM + LOWER: Garante que o e-mail fique sem espaços e 100% em minúsculas
+    LOWER(TRIM(email)) AS email_limpo,
+    
+    -- 3. CONCAT: Agrupa Nome e E-mail no formato de destinatário para envio de e-mail marketing
+    CONCAT(UPPER(TRIM(nome)), ' <', LOWER(TRIM(email)), '>') AS destinatario_notificacao,
+    
+    -- 4. CONCAT: Formata a localização do cliente para etiquetas de envio (Ex: "São Paulo / SP")
+    CONCAT(TRIM(cidade), ' / ', UPPER(TRIM(estado))) AS localizacao_cliente,
+    
+    -- 5. CHAR_LENGTH: Conta a quantidade de caracteres do nome para validações do sistema
+    CHAR_LENGTH(TRIM(nome)) AS quantidade_caracteres_nome
+
+FROM 
+    usuarios
+ORDER BY 
+    nome ASC;
+
+-- EXPLICAÇÃO DO RESULTADO PARA O PROJETO ROYAL DRIP:
+-- 1. TRIM(): Remove espaços em branco acidentais antes ou depois dos textos digitados pelos clientes.
+-- 2. UPPER() e LOWER(): Padronizam visualmente os relatórios da loja e evitam divergências no envio de e-mails.
+-- 3. CONCAT(): Unifica colunas separadas em campos prontos para uso (ex: etiqueta de envio da transportadora e e-mail marketing).
+-- 4. CHAR_LENGTH(): Ajuda o backend do Flask a verificar se o nome do cliente atende ao tamanho mínimo exigido.
