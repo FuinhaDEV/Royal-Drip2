@@ -39,18 +39,28 @@
               <p class="user-email">{{ session.get('usuario_email') }}</p>
             </div>
             <hr class="dropdown-divider" />
-            <a href="/carrinho" class="dropdown-item">Meu Carrinho</a>
-            <a href="/logout" class="dropdown-item logout-link"
+            <a href="{{ url_for('carrinho') }}" class="dropdown-item"
+              >Meu Carrinho</a
+            >
+            <a href="{{ url_for('logout') }}" class="dropdown-item logout-link"
               >Sair da Conta</a
             >
             {% else %}
-            <a href="/login" class="dropdown-item">Fazer Login</a>
-            <a href="/registro" class="dropdown-item">Criar Conta</a>
+            <a href="{{ url_for('login') }}" class="dropdown-item"
+              >Fazer Login</a
+            >
+            <a href="{{ url_for('registro') }}" class="dropdown-item"
+              >Criar Conta</a
+            >
             {% endif %}
           </div>
         </div>
 
-        <a href="/carrinho" aria-label="Carrinho de compras" class="icon-link">
+        <a
+          href="{{ url_for('carrinho') }}"
+          aria-label="Carrinho de compras"
+          class="icon-link"
+        >
           <svg
             xmlns="http://www.w3.org/2000/svg"
             viewBox="0 0 24 24"
@@ -65,10 +75,10 @@
       </div>
 
       <div class="logo">
-        <a href="/">
+        <a href="{{ url_for('index') }}">
           <img
             class="brand-image"
-            src="/static/imagens/Logo Marca/logo marca (1).png"
+            src="{{ url_for('static', filename='imagens/Logo Marca/logo marca (1).png') }}"
             alt="Royal Drip Logo"
           />
         </a>
@@ -83,23 +93,15 @@
         </ul>
       </nav>
 
-      <!-- Seção de Produtos -->
-      <section id="produtos" class="secao-container">
-
-        <!-- BOTÕES APENAS PARA FILTRAR OS PRODUTOS -->
-        <div class="nav-categorias">
-          <button class="btn-filtro active" data-filter="todos">Todos</button>
-          <button class="btn-filtro" data-filter="camisetas">Camisetas</button>
-          <button class="btn-filtro" data-filter="conjuntos">Conjuntos</button>
-          <button class="btn-filtro" data-filter="calcas">Calças</button>
-          <button class="btn-filtro" data-filter="gorros">Gorros</button>
-        </div>
-
-        <div class="produtos-grid">
-          <!-- Seus cards de produtos aqui -->
-        </div>
-      </section>
-
+      <!-- BOTÕES DE FILTRAGEM -->
+      <div class="nav-categorias">
+        <button class="btn-filtro active" data-filter="todos">Todos</button>
+        <button class="btn-filtro" data-filter="camisetas">Camisetas</button>
+        <button class="btn-filtro" data-filter="conjuntos">Conjuntos</button>
+        <button class="btn-filtro" data-filter="calcas">Calças</button>
+        <button class="btn-filtro" data-filter="gorros">Gorros</button>
+        <button class="btn-filtro" data-filter="cintos">Cintos</button>
+      </div>
     </header>
 
     <!-- Conteúdo Principal -->
@@ -109,314 +111,589 @@
         <h2 class="titulo-secao">Nossos Lançamentos</h2>
 
         <div class="produtos-grid">
-
-          <!-- Item 1 -->
-          <a class="produto-card" data-categoria="camisetas" href="{{ url_for('produto', produto_id=1) }}">
-            <div class="produto-imagem-wrap">
-              <img
-                src="/static/imagens/camisas/camisa 1.jpeg"
-                alt="Camisa Boxy Dark Angel Drop 1"
-              />
-            </div>
-            <span class="produto-nome">Camisa Boxy Dark Angel Drop 1</span>
-          </a>
-
-          <!-- Item 2 -->
-          <a class="produto-card" data-categoria="camisetas" href="{{ url_for('produto', produto_id=2) }}">
-            <div class="produto-imagem-wrap">
-              <img
-                src="/static/imagens/camisas/camisa 2.jpeg"
-                alt="Camisa Boxy Black Bite Drop 2"
-              />
-            </div>
-            <span class="produto-nome">Camisa Boxy Black Bite Drop 2</span>
-          </a>
-
-          <!-- Item 3 -->
-          <a class="produto-card" data-categoria="camisetas" href="{{ url_for('produto', produto_id=3) }}">
-            <div class="produto-imagem-wrap">
-              <img
-                src="/static/imagens/camisas/camisa 3.jpeg"
-                alt="Camisa Boxy Light Bite Drop 3"
-              />
-            </div>
-            <span class="produto-nome">Camisa Boxy Light Bite Drop 3</span>
-          </a>
-
-          <!-- Item 4 -->
-          <a class="produto-card" data-categoria="conjuntos" href="{{ url_for('produto', produto_id=4) }}">
-            <div class="produto-imagem-wrap">
-              <img
-                src="/static/imagens/blusas_Conjuntos/conjunto moletom cinza.jpg"
-                alt="Conjunto Cinza Street Drop 1"
-              />
-            </div>
-            <span class="produto-nome">Conjunto Cinza Street Drop 1</span>
-          </a>
-
-          <!-- Item 5 -->
-          <a class="produto-card" data-categoria="conjuntos" href="{{ url_for('produto', produto_id=5) }}">
-            <div class="produto-imagem-wrap">
-              <img
-                src="/static/imagens/blusas_Conjuntos/USA.jpg"
-                alt="Conjunto UK Drop 2"
-              />
-            </div>
-            <span class="produto-nome">Conjunto UK Drop 2</span>
-          </a>
-
-          <!-- Item 6 -->
-          <a class="produto-card" data-categoria="conjuntos" href="{{ url_for('produto', produto_id=6) }}">
-            <div class="produto-imagem-wrap">
-              <img
-                src="/static/imagens/blusas_Conjuntos/conjunto branco copy.jpg"
-                alt="Conjunto Branco Street Drop 3"
-              />
-            </div>
-            <span class="produto-nome">Conjunto Branco Street Drop 3</span>
-          </a>
-
-          <!-- Item 7 -->
-          <a class="produto-card" data-categoria="conjuntos" href="{{ url_for('produto', produto_id=7) }}">
-            <div class="produto-imagem-wrap">
-              <img
-                src="/static/imagens/blusas_Conjuntos/conj2.jpg"
-                alt="Conjunto Blue Street Drop 4"
-              />
-            </div>
-            <span class="produto-nome">Conjunto Blue Street Drop 4</span>
-          </a>
-
-          <!-- Item 8 -->
-          <a class="produto-card" data-categoria="conjuntos" href="{{ url_for('produto', produto_id=8) }}">
-            <div class="produto-imagem-wrap">
-              <img
-                src="/static/imagens/blusas_Conjuntos/conj3.jpg"
-                alt="Conjunto Camuflado Street Drop 5"
-              />
-            </div>
-            <span class="produto-nome">Conjunto Camuflado Street Drop 5</span>
-          </a>
-
-          <!-- Item 9 -->
-          <a class="produto-card"  data-categoria="conjuntos" href="{{ url_for('produto', produto_id=9) }}">
-            <div class="produto-imagem-wrap">
-              <img
-                src="/static/imagens/blusas_Conjuntos/conj4.jpg"
-                alt="Conjunto Cimento Street Drop 6"
-              />
-            </div>
-            <span class="produto-nome">Conjunto Cimento Street Drop 6</span>
-          </a>
-
-          <!-- Item 10 -->
           <a
-            class="produto-card" data-categoria="calcas"
+            class="produto-card"
+            data-categoria="camisetas"
+            href="{{ url_for('produto', produto_id=1) }}"
+          >
+            <div class="produto-imagem-wrap">
+              <img
+                src="{{ url_for('static', filename=img_url('imagens/camisas/camisa 1.webp')) }}"
+                alt="Camisa Boxy Dark Angel Drop 01"
+                loading="lazy"
+              />
+            </div>
+            <span class="produto-nome">Camisa Boxy Dark Angel Drop 01</span>
+          </a>
+
+          <a
+            class="produto-card"
+            data-categoria="camisetas"
+            href="{{ url_for('produto', produto_id=2) }}"
+          >
+            <div class="produto-imagem-wrap">
+              <img
+                src="{{ url_for('static', filename=img_url('imagens/camisas/camisa 2.webp')) }}"
+                alt="Camisa Boxy Black Bite Drop 02"
+                loading="lazy"
+              />
+            </div>
+            <span class="produto-nome">Camisa Boxy Black Bite Drop 02</span>
+          </a>
+
+          <a
+            class="produto-card"
+            data-categoria="camisetas"
+            href="{{ url_for('produto', produto_id=3) }}"
+          >
+            <div class="produto-imagem-wrap">
+              <img
+                src="{{ url_for('static', filename=img_url('imagens/camisas/camisa 3.webp')) }}"
+                alt="Camisa Boxy Light Bite Drop 03"
+                loading="lazy"
+              />
+            </div>
+            <span class="produto-nome">Camisa Boxy Light Bite Drop 03</span>
+          </a>
+
+          <a
+            class="produto-card"
+            data-categoria="camisetas"
+            href="{{ url_for('produto', produto_id=4) }}"
+          >
+            <div class="produto-imagem-wrap">
+              <img
+                src="{{ url_for('static', filename=img_url('imagens/camisas/camisa boxy brasilian once.webp')) }}"
+                alt="Camisa Boxy Brasilian Once"
+                loading="lazy"
+              />
+            </div>
+            <span class="produto-nome">Camisa Boxy Brasilian Once</span>
+          </a>
+
+          <a
+            class="produto-card"
+            data-categoria="camisetas"
+            href="{{ url_for('produto', produto_id=5) }}"
+          >
+            <div class="produto-imagem-wrap">
+              <img
+                src="{{ url_for('static', filename=img_url('imagens/camisas/camisa boxy come in.webp')) }}"
+                alt="Camisa Boxy Come In"
+                loading="lazy"
+              />
+            </div>
+            <span class="produto-nome">Camisa Boxy Come In</span>
+          </a>
+
+          <a
+            class="produto-card"
+            data-categoria="camisetas"
+            href="{{ url_for('produto', produto_id=6) }}"
+          >
+            <div class="produto-imagem-wrap">
+              <img
+                src="{{ url_for('static', filename=img_url('imagens/camisas/camisa boxy good plan.webp')) }}"
+                alt="Camisa Boxy Good Plan"
+                loading="lazy"
+              />
+            </div>
+            <span class="produto-nome">Camisa Boxy Good Plan</span>
+          </a>
+
+          <a
+            class="produto-card"
+            data-categoria="conjuntos"
+            href="{{ url_for('produto', produto_id=7) }}"
+          >
+            <div class="produto-imagem-wrap">
+              <img
+                src="{{ url_for('static', filename=img_url('imagens/blusas_Conjuntos/conjunto moletom cinza.webp')) }}"
+                alt="Conjunto Cinza Street Drop 01"
+                loading="lazy"
+              />
+            </div>
+            <span class="produto-nome">Conjunto Cinza Street Drop 01</span>
+          </a>
+
+          <a
+            class="produto-card"
+            data-categoria="conjuntos"
+            href="{{ url_for('produto', produto_id=8) }}"
+          >
+            <div class="produto-imagem-wrap">
+              <img
+                src="{{ url_for('static', filename=img_url('imagens/blusas_Conjuntos/USA.webp')) }}"
+                alt="Conjunto UK Drop 02"
+                loading="lazy"
+              />
+            </div>
+            <span class="produto-nome">Conjunto UK Drop 02</span>
+          </a>
+
+          <a
+            class="produto-card"
+            data-categoria="conjuntos"
+            href="{{ url_for('produto', produto_id=9) }}"
+          >
+            <div class="produto-imagem-wrap">
+              <img
+                src="{{ url_for('static', filename=img_url('imagens/blusas_Conjuntos/conjunto branco copy.webp')) }}"
+                alt="Conjunto Branco Street Drop 03"
+                loading="lazy"
+              />
+            </div>
+            <span class="produto-nome">Conjunto Branco Street Drop 03</span>
+          </a>
+
+          <a
+            class="produto-card"
+            data-categoria="conjuntos"
             href="{{ url_for('produto', produto_id=10) }}"
           >
             <div class="produto-imagem-wrap">
               <img
-                src="/static/imagens/calcas/Calça Moletom.jpg"
-                alt="Calça Moletom Letringg Drop 7"
+                src="{{ url_for('static', filename=img_url('imagens/blusas_Conjuntos/conj2.webp')) }}"
+                alt="Conjunto Blue Street Drop 04"
+                loading="lazy"
               />
             </div>
-            <span class="produto-nome">Calça Moletom Letringg Drop 7</span>
+            <span class="produto-nome">Conjunto Blue Street Drop 04</span>
           </a>
 
-          <!-- Item 11 -->
           <a
-            class="produto-card" data-categoria="calcas"
+            class="produto-card"
+            data-categoria="conjuntos"
             href="{{ url_for('produto', produto_id=11) }}"
           >
             <div class="produto-imagem-wrap">
               <img
-                src="/static/imagens/calcas/calça branca.jpg"
-                alt="Calça Moletom Branca Drop 8"
+                src="{{ url_for('static', filename=img_url('imagens/blusas_Conjuntos/conj3.webp')) }}"
+                alt="Conjunto Camuflado Street Drop 05"
+                loading="lazy"
               />
             </div>
-            <span class="produto-nome">Calça Moletom Branca Drop 8</span>
+            <span class="produto-nome">Conjunto Camuflado Street Drop 05</span>
           </a>
 
-          <!-- Item 12 -->
           <a
-            class="produto-card" data-categoria="calcas"
+            class="produto-card"
+            data-categoria="conjuntos"
             href="{{ url_for('produto', produto_id=12) }}"
           >
             <div class="produto-imagem-wrap">
               <img
-                src="/static/imagens/calcas/calça azul.jpg"
-                alt="Calça Moletom Azul Drop 9"
+                src="{{ url_for('static', filename=img_url('imagens/blusas_Conjuntos/conj4.webp')) }}"
+                alt="Conjunto Cimento Street Drop 06"
+                loading="lazy"
               />
             </div>
-            <span class="produto-nome">Calça Moletom Azul Drop 9</span>
+            <span class="produto-nome">Conjunto Cimento Street Drop 06</span>
           </a>
 
-          <!-- Item 13 -->
           <a
-            class="produto-card" data-categoria="calcas"
+            class="produto-card"
+            data-categoria="calcas"
             href="{{ url_for('produto', produto_id=13) }}"
           >
             <div class="produto-imagem-wrap">
               <img
-                src="/static/imagens/calcas/calça jeans hard 2.jpeg"
+                src="{{ url_for('static', filename=img_url('imagens/calcas/Calça Moletom.webp')) }}"
+                alt="Calça de Moletom Lettering Drop 07"
+                loading="lazy"
+              />
+            </div>
+            <span class="produto-nome">Calça de Moletom Lettering Drop 07</span>
+          </a>
+
+          <a
+            class="produto-card"
+            data-categoria="calcas"
+            href="{{ url_for('produto', produto_id=14) }}"
+          >
+            <div class="produto-imagem-wrap">
+              <img
+                src="{{ url_for('static', filename=img_url('imagens/calcas/calça branca.webp')) }}"
+                alt="Calça de Moletom Branca Drop 08"
+                loading="lazy"
+              />
+            </div>
+            <span class="produto-nome">Calça de Moletom Branca Drop 08</span>
+          </a>
+
+          <a
+            class="produto-card"
+            data-categoria="calcas"
+            href="{{ url_for('produto', produto_id=15) }}"
+          >
+            <div class="produto-imagem-wrap">
+              <img
+                src="{{ url_for('static', filename=img_url('imagens/calcas/calça azul.webp')) }}"
+                alt="Calça de Moletom Azul Drop 09"
+                loading="lazy"
+              />
+            </div>
+            <span class="produto-nome">Calça de Moletom Azul Drop 09</span>
+          </a>
+
+          <a
+            class="produto-card"
+            data-categoria="calcas"
+            href="{{ url_for('produto', produto_id=16) }}"
+          >
+            <div class="produto-imagem-wrap">
+              <img
+                src="{{ url_for('static', filename=img_url('imagens/calcas/calça jeans hard 2.webp')) }}"
                 alt="Calça Jeans Baggy Hard"
+                loading="lazy"
               />
             </div>
             <span class="produto-nome">Calça Jeans Baggy Hard</span>
           </a>
 
-          <!-- Item 14 -->
           <a
-            class="produto-card" data-categoria="calcas"
-            href="{{ url_for('produto', produto_id=14) }}"
+            class="produto-card"
+            data-categoria="calcas"
+            href="{{ url_for('produto', produto_id=17) }}"
           >
             <div class="produto-imagem-wrap">
               <img
-                src="/static/imagens/calcas/calça jeans hard.jpeg"
+                src="{{ url_for('static', filename=img_url('imagens/calcas/calça jeans hard.webp')) }}"
                 alt="Calça Jeans Baggy Worn Out"
+                loading="lazy"
               />
             </div>
             <span class="produto-nome">Calça Jeans Baggy Worn Out</span>
           </a>
 
-          <!-- Item 15 -->
           <a
-            class="produto-card" data-categoria="calcas"
-            href="{{ url_for('produto', produto_id=15) }}"
+            class="produto-card"
+            data-categoria="calcas"
+            href="{{ url_for('produto', produto_id=18) }}"
           >
             <div class="produto-imagem-wrap">
               <img
-                src="/static/imagens/calcas/calça regular bless.png"
+                src="{{ url_for('static', filename=img_url('imagens/calcas/calça regular bless.webp')) }}"
                 alt="Calça Regular Bless"
+                loading="lazy"
               />
             </div>
             <span class="produto-nome">Calça Regular Bless</span>
           </a>
 
-          <!-- Item 16 -->
           <a
-            class="produto-card" data-categoria="calcas"
-            href="{{ url_for('produto', produto_id=16) }}"
+            class="produto-card"
+            data-categoria="calcas"
+            href="{{ url_for('produto', produto_id=19) }}"
           >
             <div class="produto-imagem-wrap">
               <img
-                src="/static/imagens/calcas/calça jeans sant.png"
+                src="{{ url_for('static', filename=img_url('imagens/calcas/calça jeans sant.webp')) }}"
                 alt="Calça Jeans Sant"
+                loading="lazy"
               />
             </div>
             <span class="produto-nome">Calça Jeans Sant</span>
           </a>
 
-          <!-- Item 17 -->
           <a
-            class="produto-card" data-categoria="calcas"
-            href="{{ url_for('produto', produto_id=17) }}"
+            class="produto-card"
+            data-categoria="calcas"
+            href="{{ url_for('produto', produto_id=20) }}"
           >
             <div class="produto-imagem-wrap">
               <img
-                src="/static/imagens/calcas/calça jeans barrel.png"
+                src="{{ url_for('static', filename=img_url('imagens/calcas/calça jeans barrel.webp')) }}"
                 alt="Calça Jeans Barrel"
+                loading="lazy"
               />
             </div>
             <span class="produto-nome">Calça Jeans Barrel</span>
           </a>
 
-          <!-- Item 18 -->
           <a
-            class="produto-card" data-categoria="calcas"
-            href="{{ url_for('produto', produto_id=18) }}"
+            class="produto-card"
+            data-categoria="calcas"
+            href="{{ url_for('produto', produto_id=21) }}"
           >
             <div class="produto-imagem-wrap">
               <img
-                src="/static/imagens/calcas/calça baggy nation.png"
+                src="{{ url_for('static', filename=img_url('imagens/calcas/calça baggy nation.webp')) }}"
                 alt="Calça Baggy Nation"
+                loading="lazy"
               />
             </div>
             <span class="produto-nome">Calça Baggy Nation</span>
           </a>
 
-          <!-- Item 19 -->
           <a
-            class="produto-card" data-categoria="calcas"
-            href="{{ url_for('produto', produto_id=19) }}"
+            class="produto-card"
+            data-categoria="calcas"
+            href="{{ url_for('produto', produto_id=22) }}"
           >
             <div class="produto-imagem-wrap">
               <img
-                src="/static/imagens/calcas/calça baggy camuflada.png"
+                src="{{ url_for('static', filename=img_url('imagens/calcas/calça baggy camuflada.webp')) }}"
                 alt="Calça Jeans Baggy Camuflada"
+                loading="lazy"
               />
             </div>
             <span class="produto-nome">Calça Jeans Baggy Camuflada</span>
           </a>
 
-          <!-- Item 20 -->
           <a
-            class="produto-card" data-categoria="gorros"
-            href="{{ url_for('produto', produto_id=20) }}"
+            class="produto-card"
+            data-categoria="gorros"
+            href="{{ url_for('produto', produto_id=23) }}"
           >
             <div class="produto-imagem-wrap">
               <img
-                src="/static/imagens/gorros/gorro oncinha y2k.png"
+                src="{{ url_for('static', filename=img_url('imagens/gorros/gorro oncinha y2k.webp')) }}"
                 alt="Gorro Oncinha Y2K"
+                loading="lazy"
               />
             </div>
             <span class="produto-nome">Gorro Oncinha Y2K</span>
           </a>
 
-          <!-- Item 21 -->
           <a
-            class="produto-card" data-categoria="gorros"
-            href="{{ url_for('produto', produto_id=21) }}"
+            class="produto-card"
+            data-categoria="gorros"
+            href="{{ url_for('produto', produto_id=24) }}"
           >
             <div class="produto-imagem-wrap">
               <img
-                src="/static/imagens/gorros/gorro pré cort.png"
+                src="{{ url_for('static', filename=img_url('imagens/gorros/gorro pré cort.webp')) }}"
                 alt="Gorro Pré Cort"
+                loading="lazy"
               />
             </div>
             <span class="produto-nome">Gorro Pré Cort</span>
           </a>
 
-          <!-- Item 22 -->
           <a
-            class="produto-card" data-categoria="gorros"
-            href="{{ url_for('produto', produto_id=22) }}"
+            class="produto-card"
+            data-categoria="gorros"
+            href="{{ url_for('produto', produto_id=25) }}"
           >
             <div class="produto-imagem-wrap">
               <img
-                src="/static/imagens/gorros/gorro y2k black.png"
+                src="{{ url_for('static', filename=img_url('imagens/gorros/gorro y2k black.webp')) }}"
                 alt="Gorro Y2K Black"
+                loading="lazy"
               />
             </div>
             <span class="produto-nome">Gorro Y2K Black</span>
           </a>
 
-          <!-- Item 23 -->
           <a
-            class="produto-card" data-categoria="gorros"
-            href="{{ url_for('produto', produto_id=23) }}"
+            class="produto-card"
+            data-categoria="gorros"
+            href="{{ url_for('produto', produto_id=26) }}"
           >
             <div class="produto-imagem-wrap">
               <img
-                src="/static/imagens/gorros/gorro y2k white.png"
+                src="{{ url_for('static', filename=img_url('imagens/gorros/gorro y2k white.webp')) }}"
                 alt="Gorro Y2K White"
+                loading="lazy"
               />
             </div>
             <span class="produto-nome">Gorro Y2K White</span>
           </a>
 
-          <!-- Item 24 -->
           <a
-            class="produto-card" data-categoria="gorros"
-            href="{{ url_for('produto', produto_id=24) }}"
+            class="produto-card"
+            data-categoria="gorros"
+            href="{{ url_for('produto', produto_id=27) }}"
           >
             <div class="produto-imagem-wrap">
               <img
-                src="/static/imagens/gorros/gorro white red.jpg"
+                src="{{ url_for('static', filename=img_url('imagens/gorros/gorro white red.webp')) }}"
                 alt="Gorro White Red"
+                loading="lazy"
               />
             </div>
             <span class="produto-nome">Gorro White Red</span>
+          </a>
+
+          <a
+            class="produto-card"
+            data-categoria="cintos"
+            href="{{ url_for('produto', produto_id=28) }}"
+          >
+            <div class="produto-imagem-wrap">
+              <img
+                src="{{ url_for('static', filename=img_url('imagens/cintos/blue star.webp')) }}"
+                alt="Cinto Blue Star"
+                loading="lazy"
+              />
+            </div>
+            <span class="produto-nome">Cinto Blue Star</span>
+          </a>
+
+          <a
+            class="produto-card"
+            data-categoria="cintos"
+            href="{{ url_for('produto', produto_id=29) }}"
+          >
+            <div class="produto-imagem-wrap">
+              <img
+                src="{{ url_for('static', filename=img_url('imagens/cintos/cinto caveira.webp')) }}"
+                alt="Cinto Cravejado de Caveira"
+                loading="lazy"
+              />
+            </div>
+            <span class="produto-nome">Cinto Cravejado de Caveira</span>
+          </a>
+
+          <a
+            class="produto-card"
+            data-categoria="cintos"
+            href="{{ url_for('produto', produto_id=30) }}"
+          >
+            <div class="produto-imagem-wrap">
+              <img
+                src="{{ url_for('static', filename=img_url('imagens/cintos/fly heart.webp')) }}"
+                alt="Cinto Fly Heart"
+                loading="lazy"
+              />
+            </div>
+            <span class="produto-nome">Cinto Fly Heart</span>
+          </a>
+
+          <a
+            class="produto-card"
+            data-categoria="cintos"
+            href="{{ url_for('produto', produto_id=31) }}"
+          >
+            <div class="produto-imagem-wrap">
+              <img
+                src="{{ url_for('static', filename=img_url('imagens/cintos/purple cup.webp')) }}"
+                alt="Cinto Purple Cup"
+                loading="lazy"
+              />
+            </div>
+            <span class="produto-nome">Cinto Purple Cup</span>
+          </a>
+
+          <a
+            class="produto-card"
+            data-categoria="cintos"
+            href="{{ url_for('produto', produto_id=32) }}"
+          >
+            <div class="produto-imagem-wrap">
+              <img
+                src="{{ url_for('static', filename=img_url('imagens/cintos/red die.webp')) }}"
+                alt="Red Die"
+                loading="lazy"
+              />
+            </div>
+            <span class="produto-nome">Red Die</span>
+          </a>
+
+          <a
+            class="produto-card"
+            data-categoria="cintos"
+            href="{{ url_for('produto', produto_id=33) }}"
+          >
+            <div class="produto-imagem-wrap">
+              <img
+                src="{{ url_for('static', filename=img_url('imagens/cintos/stelar white.webp')) }}"
+                alt="Stelar White"
+                loading="lazy"
+              />
+            </div>
+            <span class="produto-nome">Stelar White</span>
+          </a>
+
+          <a
+            class="produto-card"
+            data-categoria="cintos"
+            href="{{ url_for('produto', produto_id=34) }}"
+          >
+            <div class="produto-imagem-wrap">
+              <img
+                src="{{ url_for('static', filename=img_url('imagens/cintos/cinto camuflado.webp')) }}"
+                alt="Cinto Camuflado"
+                loading="lazy"
+              />
+            </div>
+            <span class="produto-nome">Cinto Camuflado</span>
+          </a>
+
+          <a
+            class="produto-card"
+            data-categoria="cintos"
+            href="{{ url_for('produto', produto_id=35) }}"
+          >
+            <div class="produto-imagem-wrap">
+              <img
+                src="{{ url_for('static', filename=img_url('imagens/cintos/cinto swag branco.webp')) }}"
+                alt="Cinto Swag Branco"
+                loading="lazy"
+              />
+            </div>
+            <span class="produto-nome">Cinto Swag Branco</span>
+          </a>
+
+          <a
+            class="produto-card"
+            data-categoria="cintos"
+            href="{{ url_for('produto', produto_id=36) }}"
+          >
+            <div class="produto-imagem-wrap">
+              <img
+                src="{{ url_for('static', filename=img_url('imagens/cintos/cinto swag preto.webp')) }}"
+                alt="Cinto Swag Preto"
+                loading="lazy"
+              />
+            </div>
+            <span class="produto-nome">Cinto Swag Preto</span>
+          </a>
+
+          <a
+            class="produto-card"
+            data-categoria="cintos"
+            href="{{ url_for('produto', produto_id=37) }}"
+          >
+            <div class="produto-imagem-wrap">
+              <img
+                src="{{ url_for('static', filename=img_url('imagens/cintos/cinto lunar bl.webp')) }}"
+                alt="Cinto Lunar BL"
+                loading="lazy"
+              />
+            </div>
+            <span class="produto-nome">Cinto Lunar BL</span>
+          </a>
+
+          <a
+            class="produto-card"
+            data-categoria="cintos"
+            href="{{ url_for('produto', produto_id=38) }}"
+          >
+            <div class="produto-imagem-wrap">
+              <img
+                src="{{ url_for('static', filename=img_url('imagens/cintos/cinto marrom star.webp')) }}"
+                alt="Cinto Marrom Star"
+                loading="lazy"
+              />
+            </div>
+            <span class="produto-nome">Cinto Marrom Star</span>
+          </a>
+
+          <a
+            class="produto-card"
+            data-categoria="cintos"
+            href="{{ url_for('produto', produto_id=39) }}"
+          >
+            <div class="produto-imagem-wrap">
+              <img
+                src="{{ url_for('static', filename=img_url('imagens/cintos/cinto couro cowboy.webp')) }}"
+                alt="Cinto Couro Cowboy"
+                loading="lazy"
+              />
+            </div>
+            <span class="produto-nome">Cinto Couro Cowboy</span>
           </a>
         </div>
       </section>
@@ -476,8 +753,7 @@
           }
         });
       }
-      
     </script>
-    <script src="{{ url_for('static', filename='js/java_navbar.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/navbar_javascript.js') }}"></script>
   </body>
 </html>
